@@ -22,7 +22,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 8081, // Đặt cổng cho server dev
+    port: 8080, // Đặt cổng cho server dev
     proxy: {
         '/api': {
             target: 'http://localhost:3000', // Đích mà bạn muốn proxy

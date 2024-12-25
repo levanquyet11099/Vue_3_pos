@@ -1,10 +1,11 @@
 <script setup>
 import TheWelcome from '../components/TheWelcome.vue'
 import TabOrder from './TabOrder.vue'
+import InvoiceOrder from './InvoiceOrder.vue'
 </script>
 
 <template>
-  <div class="home">
+  <div class="fiex" style="position: relative">
     <!-- <div class="flex p-4 pb-0 border-b bg-[#0090DA]">
       <a href="/" class="imgLogo mt-"><img src="../assets/salekit.png" width="39" /></a>
       <div class="w-1/3 justify-between items-center ml-[20px]">
@@ -40,5 +41,6 @@ import TabOrder from './TabOrder.vue'
       </div>
     </div> -->
     <TabOrder></TabOrder>
+    <InvoiceOrder></InvoiceOrder>
   </div>
 </template>

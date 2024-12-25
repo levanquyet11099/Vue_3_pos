@@ -1,0 +1,126 @@
+<script setup>
+import WelcomeItem from './WelcomeItem.vue'
+import DocumentationIcon from './icons/IconDocumentation.vue'
+import ToolingIcon from './icons/IconTooling.vue'
+import EcosystemIcon from './icons/IconEcosystem.vue'
+import CommunityIcon from './icons/IconCommunity.vue'
+import SupportIcon from './icons/IconSupport.vue'
+</script>
+
+<template>
+  <div
+    class="bg-gray-200 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center w-[75px] gap-4"
+  >
+    <a class="p-[12px]" style="border-radius: 8px; background-color: white" title="Bán hàng">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9 22C9.55228 22 10 21.5523 10 21C10 20.4477 9.55228 20 9 20C8.44772 20 8 20.4477 8 21C8 21.5523 8.44772 22 9 22Z"
+          stroke="#428BCA"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></path>
+        <path
+          d="M20 22C20.5523 22 21 21.5523 21 21C21 20.4477 20.5523 20 20 20C19.4477 20 19 20.4477 19 21C19 21.5523 19.4477 22 20 22Z"
+          stroke="#428BCA"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></path>
+        <path
+          d="M1 1H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6"
+          stroke="#428BCA"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></path>
+      </svg>
+    </a>
+    <a
+      class="hover:bg-white"
+      style="padding: 12px; border-radius: 8px"
+      title="Tra cứu đơn hàng"
+      href="https://salekit.com/order"
+      target="_blank"
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M20.5 7.04C20.5 3.01 19.56 2 15.78 2H8.22C4.44 2 3.5 3.01 3.5 7.04V18.3C3.5 20.96 4.96 21.59 6.73 19.69L6.74 19.68C7.56 18.81 8.81 18.88 9.52 19.83L10.53 21.18C11.34 22.25 12.65 22.25 13.46 21.18L14.47 19.83C15.19 18.87 16.44 18.8 17.26 19.68C19.04 21.58 20.49 20.95 20.49 18.29V11M8 7H16M9 11H15"
+          stroke="#7A7A7A"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </a>
+    <a
+      class="hover:bg-white"
+      style="padding: 12px; border-radius: 8px"
+      title="Tra cứu sản phẩm"
+      href="https://salekit.com/product"
+      target="_blank"
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M11.75 1L21.5 5.875V18.0625L11.75 22.9258L2 18.0625V5.875L11.75 1ZM19.0742 6.34375L11.75 2.6875L8.92578 4.09375L16.2031 7.77344L19.0742 6.34375ZM11.75 10L14.5391 8.61719L7.25 4.9375L4.42578 6.34375L11.75 10ZM3.5 7.5625V17.125L11 20.875V11.3125L3.5 7.5625ZM12.5 20.875L20 17.125V7.5625L12.5 11.3125V20.875Z"
+          fill="#7A7A7A"
+        />
+      </svg>
+    </a>
+    <a
+      class="hover:bg-white"
+      style="padding: 12px; border-radius: 8px"
+      title="Thu chi"
+      href="https://fin.salekit.com/receipt"
+      target="_blank"
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M7 17L17 7M9 7V9M9 9V11M9 9H11M9 9H7M17 15H13M2.5 12C2.5 7.522 2.5 5.282 3.891 3.891C5.282 2.5 7.521 2.5 12 2.5C16.478 2.5 18.718 2.5 20.109 3.891C21.5 5.282 21.5 7.521 21.5 12C21.5 16.478 21.5 18.718 20.109 20.109C18.718 21.5 16.479 21.5 12 21.5C7.522 21.5 5.282 21.5 3.891 20.109C2.5 18.718 2.5 16.479 2.5 12Z"
+          stroke="#7A7A7A"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </a>
+    <a class="hover:bg-white" style="padding: 12px; border-radius: 8px" title="Quản lý ca">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M17.75 3C18.612 3 19.4386 3.34241 20.0481 3.9519C20.6576 4.5614 21 5.38805 21 6.25V17.75C21 18.612 20.6576 19.4386 20.0481 20.0481C19.4386 20.6576 18.612 21 17.75 21H12.76C12.926 20.618 13.004 20.213 13.004 19.813C13.004 19.707 12.9973 19.6027 12.984 19.5H17.75C18.2141 19.5 18.6592 19.3156 18.9874 18.9874C19.3156 18.6592 19.5 18.2141 19.5 17.75V6.25C19.5 5.78587 19.3156 5.34075 18.9874 5.01256C18.6592 4.68437 18.2141 4.5 17.75 4.5H6.25C5.78587 4.5 5.34075 4.68437 5.01256 5.01256C4.68437 5.34075 4.5 5.78587 4.5 6.25V11.51C3.96605 11.5486 3.4503 11.7205 3 12.01V6.25C3 5.38805 3.34241 4.5614 3.9519 3.9519C4.5614 3.34241 5.38805 3 6.25 3H17.75ZM11.75 6C11.9312 6.00001 12.1063 6.06564 12.2429 6.18477C12.3795 6.30389 12.4684 6.46845 12.493 6.648L12.5 6.75V12H16.248C16.438 12.0001 16.6209 12.0722 16.7598 12.202C16.8986 12.3317 16.9831 12.5093 16.996 12.6989C17.009 12.8885 16.9495 13.0759 16.8296 13.2233C16.7097 13.3707 16.5382 13.4671 16.35 13.493L16.248 13.5H11.75C11.5688 13.5 11.3937 13.4344 11.2571 13.3152C11.1205 13.1961 11.0316 13.0316 11.007 12.852L11 12.75V6.75C11 6.55109 11.079 6.36032 11.2197 6.21967C11.3603 6.07902 11.5511 6 11.75 6ZM4.75 17C5.34674 17 5.91903 16.7629 6.34099 16.341C6.76295 15.919 7 15.3467 7 14.75C7 14.1533 6.76295 13.581 6.34099 13.159C5.91903 12.7371 5.34674 12.5 4.75 12.5C4.15326 12.5 3.58097 12.7371 3.15901 13.159C2.73705 13.581 2.5 14.1533 2.5 14.75C2.5 15.3467 2.73705 15.919 3.15901 16.341C3.58097 16.7629 4.15326 17 4.75 17ZM4.75 23C7.429 23 8.5 21.431 8.5 19.875C8.5 18.84 7.78 18 6.893 18H2.607C1.72 18 1 18.84 1 19.875C1 21.437 2.071 23 4.75 23ZM11.5 15.75C11.5 16.2141 11.3156 16.6592 10.9874 16.9874C10.6592 17.3156 10.2141 17.5 9.75 17.5C9.28587 17.5 8.84075 17.3156 8.51256 16.9874C8.18437 16.6592 8 16.2141 8 15.75C8 15.2859 8.18437 14.8408 8.51256 14.5126C8.84075 14.1844 9.28587 14 9.75 14C10.2141 14 10.6592 14.1844 10.9874 14.5126C11.3156 14.8408 11.5 15.2859 11.5 15.75ZM8.916 22C9.32 21.34 9.498 20.595 9.498 19.875C9.49709 19.3983 9.38765 18.9281 9.178 18.5H10.718C11.428 18.5 12.004 19.088 12.004 19.813C12.004 20.903 11.147 22 9.004 22H8.916Z"
+          fill="#7A7A7A"
+        />
+      </svg>
+    </a>
+  </div>
+</template>

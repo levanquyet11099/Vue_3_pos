@@ -1,7 +1,7 @@
 <script setup>
 import TheWelcome from '../components/TheWelcome.vue'
-import TabOrder from './TabOrder.vue'
-import InvoiceOrder from './InvoiceOrder.vue'
+import TabOrder from './TabOrderCopy.vue'
+// import InvoiceOrder from './InvoiceOrder.vue'
 </script>
 
 <template>

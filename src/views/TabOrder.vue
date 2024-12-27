@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import iconAddTab from '@/components/icons/iconAddTab.vue'
+import IconAddTab from '@/components/icons/IconAddTab.vue'
 export default {
   data() {
     return {

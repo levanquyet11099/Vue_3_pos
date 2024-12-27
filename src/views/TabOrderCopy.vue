@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-tabs v-model="tab" bg-color="red-lighten-2">
+    <v-tabs bg-color="red-lighten-2">
       <v-tab v-for="(n, index) in items" :key="n.key" :text="`Item ${n.title}`" :value="n.title">
         <div class="flex">
           {{ n.title }}
@@ -46,7 +46,7 @@
   </v-card>
 </template>
 <script>
-import iconAddTab from '@/components/icons/iconAddTab.vue'
+import iconAddTab from '@/components/icons/IconAddTab.vue'
 export default {
   data() {
     return {

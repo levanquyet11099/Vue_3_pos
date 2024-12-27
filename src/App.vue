@@ -27,7 +27,7 @@ import './assets/main.css'
 
     <RouterView />
     <div class="fixed flex mt-[-45px]">
-      <TheWelcome></TheWelcome>
+      <!-- <TheWelcome></TheWelcome> -->
       <!-- <TabOrder></TabOrder> -->
       <!-- <TableProduct></TableProduct> -->
     </div>

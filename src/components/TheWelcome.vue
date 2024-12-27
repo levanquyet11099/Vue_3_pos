@@ -1,12 +1,3 @@
-<script setup>
-import WelcomeItem from './WelcomeItem.vue'
-import DocumentationIcon from './icons/IconDocumentation.vue'
-import ToolingIcon from './icons/IconTooling.vue'
-import EcosystemIcon from './icons/IconEcosystem.vue'
-import CommunityIcon from './icons/IconCommunity.vue'
-import SupportIcon from './icons/IconSupport.vue'
-</script>
-
 <template>
   <div
     class="fixed bg-gray-200 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center w-[75px] gap-4 z-1000"

@@ -99,7 +99,12 @@
         />
       </svg>
     </a>
-    <a class="hover:bg-white" style="padding: 12px; border-radius: 8px" title="Quản lý ca">
+    <router-link
+      class="hover:bg-white"
+      style="padding: 12px; border-radius: 8px"
+      title="Quản lý ca"
+      to="/shift"
+    >
       <svg
         width="24"
         height="24"
@@ -112,6 +117,6 @@
           fill="#7A7A7A"
         />
       </svg>
-    </a>
+    </router-link>
   </div>
 </template>

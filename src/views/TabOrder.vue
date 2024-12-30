@@ -1,137 +1,257 @@
-<template>
-  <v-card class="border-none">
-    <v-toolbar color="primary" class="pl-[15vw] h-[60px]" style="display: flex">
-      <v-tabs v-model="tab" class="max-w-[50vw]">
-        <v-tab
-          v-for="(item, index) in items"
-          :key="index"
-          :text="item.title"
-          :value="item.key"
-          :class="[tab === index ? '' : 'opacity-50']"
-          class="realvite bg-white rounded-t-lg ml-2 border-b-none my-auto pt-[10px] hover:opacity-200 hover:bg-white hover:text-gray-900 flex justify-between items-center"
-          style="height: 35px; margin-bottom: 0 !important"
-          @click="changeTab(index)"
-          >{{ item.title }}
-          <svg
-            v-if="index != 0"
-            @click="deleteTab(index)"
-            class="ml-2 px-auto"
-            width="20"
-            height="21"
-            viewBox="0 0 20 21"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M15 5.5L5 15.5"
-              stroke="#7A7A7A"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M5 5.5L15 15.5"
-              stroke="#7A7A7A"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </v-tab>
-        <div
-          class="mt-7 ml-2 rounded-t-lg w-[35px] h-[35px] flex justify-center items-center"
-          @click="addTab()"
-        >
-          <svg
-            class="hover:fill-gray-500"
-            width="24"
-            height="25"
-            viewBox="0 0 24 25"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 22.5C17.5228 22.5 22 18.0228 22 12.5C22 6.97715 17.5228 2.5 12 2.5C6.47715 2.5 2 6.97715 2 12.5C2 18.0228 6.47715 22.5 12 22.5Z"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M12 8.5V16.5"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M8 12.5H16"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </div>
-      </v-tabs>
-    </v-toolbar>
-
-    <v-tabs-window v-model="tab" class="ml-[75px]">
-      <v-tabs-window-item v-for="(item, index) in items" :key="item + index" :value="item">
-        <v-card flat>
-          <div class="pl-[20px]">
-            <div class="w-[70vw] flex flex-nowrap gap-[20px] p-[12px] border-b-[2px]">
-              <p class="text-[14px] text-left font-bold text-[#7a7a7a] w-2/5">Tên sản phẩm</p>
-              <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5">Đơn giá</p>
-              <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-1/5">Số lượng</p>
-              <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5">Thành tiền</p>
-              <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-1/5">Xóa</p>
-            </div>
-          </div>
-        </v-card>
-      </v-tabs-window-item>
-    </v-tabs-window>
-  </v-card>
-</template>
-
-<script>
+<script lang="ts" setup>
 import IconAddTab from '@/components/icons/IconAddTab.vue'
-export default {
-  data() {
-    return {
-      tab: 1,
-      items: [
-        { title: 'hóa đơn', key: 0 },
-        { title: 'hóa đơn 1', key: 1 },
-      ],
-    }
-  },
-  methods: {
-    changeTab(tab) {
-      this.tab = tab
-    },
-    addTab() {
-      const maxKey = this.items.length ? Math.max(...this.items.map((item) => item.key)) : 0
-      this.items.push({ title: 'hóa đơn ' + (maxKey + 1), key: maxKey + 1 })
-      this.tab = this.items.length - 1
-    },
-    deleteTab(index) {
-      if (index <= 0) {
-        return
-      }
-      this.items.splice(index, 1)
+import IconDeleteTab from '@/components/icons/IconDeleteTab.vue'
+import TheWelcome from '@/components/TheWelcome.vue'
+import InvoiceOrder from './InvoiceOrder.vue'
+import { Helper } from '../helper.js'
+import { ref, reactive, onMounted, watchEffect, nextTick } from 'vue'
 
-      // Nếu không còn tab nào, đặt tab về 0
-      if (this.items.length === 0) {
-        this.tab = 0
-        return
-      }
+interface Product {
+  id: number
+  image: string
+  product_name: string
+  price: number
+  quantity: number
+  total: number
+}
+interface Item {
+  title: string
+  key: number
+  products: Product[]
+}
+// Import các thành phần cần dùng
+const components = {
+  InvoiceOrder,
+  IconAddTab,
+  IconDeleteTab,
+  TheWelcome,
+}
 
-      // Nếu tab hiện tại là tab cuối cùng, chọn tab trước đó
-      if (this.tab >= index) {
-        this.tab = Math.max(index - 2, 0) // Đảm bảo không dưới 0
-      }
-    },
+// Reactive dữ liệu của component
+const tab = ref(0)
+const items = reactive<Item[]>([
+  {
+    title: 'Hóa đơn',
+    key: 0,
+    products: [
+      {
+        id: 12,
+        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
+        product_name: 'name_product',
+        price: 1000,
+        quantity: 1,
+        total: 1000,
+      },
+      {
+        id: 13,
+        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
+        product_name: 'name_product1',
+        price: 1001,
+        quantity: 1,
+        total: 1001,
+      },
+    ],
   },
+  {
+    title: 'Hóa đơn 1',
+    key: 1,
+    products: [
+      {
+        id: 14,
+        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
+        product_name: 'name_product11',
+        price: 1000,
+        quantity: 1,
+        total: 1000,
+      },
+    ],
+  },
+  {
+    title: 'Hóa đơn 2',
+    key: 2,
+    products: [
+      {
+        id: 16,
+        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
+        product_name: 'name_product2',
+        price: 1000,
+        quantity: 1,
+        total: 1000,
+      },
+    ],
+  },
+  {
+    title: 'Hóa đơn 3',
+    key: 3,
+    products: [
+      {
+        id: 15,
+        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
+        product_name: 'name_product3',
+        price: 1000,
+        quantity: 1,
+        total: 1000,
+      },
+    ],
+  },
+  {
+    title: 'Hóa đơn 4',
+    key: 4,
+    products: [
+      {
+        id: 17,
+        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
+        product_name: 'name_product4',
+        price: 1000,
+        quantity: 1,
+        total: 1000,
+      },
+    ],
+  },
+])
+const itemSelect = ref<Item | null>(null)
+
+// Khi component được mount, chọn tab đầu tiên
+onMounted(() => {
+  itemSelect.value = items[tab.value] || null
+})
+// Các phương thức
+const changeTab = (newTab: number) => {
+  tab.value = newTab
+  itemSelect.value = items[newTab] || null
+}
+function updateQuantity(product: Product, change: number) {
+  const selectedProduct = itemSelect.value?.products.find((p) => p.id === product.id)
+  const index_ = itemSelect.value?.products.findIndex((p) => p.id === product.id)
+  if (selectedProduct) {
+    selectedProduct.quantity += change // Cộng/trừ số lượng
+    if (selectedProduct.quantity < 1) selectedProduct.quantity = 1 // Không cho phép số lượng nhỏ hơn 1
+    selectedProduct.total = selectedProduct.quantity * selectedProduct.price
+    // if (itemSelect.value) {
+    //   itemSelect.value.products[index_] = selectedProduct
+    // }
+  }
+}
+
+const addTab = () => {
+  const maxKey = items.length ? Math.max(...items.map((item) => item.key)) : 0
+  items.push({ title: `Hóa đơn ${maxKey + 1}`, key: maxKey + 1, products: [] })
+  tab.value = items.length - 1
+  itemSelect.value = items[tab.value]
+}
+
+const deleteTab = async (index: number) => {
+  if (index <= 0) return // Không cho phép xóa tab đầu tiên
+
+  // Nếu xóa phần tử cuối cùng và đang được chọnchọn, chuyển tab về phần tử trước đó
+  if (index === items.length - 1 && tab.value === items.length - 1) {
+    tab.value = items.length - 2 // Chuyển về phần tử kế cuối
+  } else if (tab.value >= index) {
+    // Nếu xóa phần tử trước tab hiện tại, điều chỉnh tab
+    tab.value = tab.value - 1
+  } else if (tab.value < index) {
+    // Nếu xóa phần tử sau tab hiện tại, không cần điều chỉnh tab
+  }
+  items.splice(index, 1)
+  itemSelect.value = items[tab.value]
+}
+
+const deleteProduct = (index: number) => {
+  itemSelect.value?.products.splice(index, 1)
 }
 </script>
+<template>
+  <div class="h-[50px] bg-blue w-full">
+    <div class="flex gap-4 ml-[20vw] pt-[15px]">
+      <div
+        v-for="(n, index) in items"
+        :key="n.key"
+        :text="`Item ${n.title}`"
+        :value="n.title"
+        class="bg-white rounded-t-[10px] w-[120px] cursor-pointer items-center justify-center h-[35px] text-center flex"
+        :class="{ 'opacity-50': tab !== index }"
+      >
+        <div class="flex no-wrap text-center pt-[5px]">
+          <div @click="changeTab(index)">{{ n.title }}</div>
+
+          <button
+            v-if="index != 0"
+            @click="deleteTab(index)"
+            class="hover:bg-gray-200 hover:rounded-lg ml-2"
+          >
+            <IconDeleteTab></IconDeleteTab>
+          </button>
+        </div>
+      </div>
+      <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-[5px]" />
+    </div>
+  </div>
+  <div class="flex">
+    <TheWelcome></TheWelcome>
+    <div class="pl-[20px] ml-[70px] max-w-[70vw]">
+      <div class="">
+        <div class="w-[70vw] flex flex-nowrap gap-[20px] p-[12px] border-b-[2px]">
+          <p class="text-[14px] text-left font-bold text-[#7a7a7a] w-2/5 ml-[70px]">
+            Sản phẩm
+            {{ itemSelect?.products?.length ? '(' + itemSelect.products.length + ') ' : '' }}
+          </p>
+          <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5">Giá bán</p>
+          <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-1/5">Số lượng</p>
+          <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5">Thành tiền</p>
+          <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-1/5">Xóa</p>
+        </div>
+      </div>
+      <div v-if="itemSelect && itemSelect.products" class="">
+        <div v-for="(p, index) in itemSelect.products" :key="p.id" :value="p.id">
+          <div class="w-[70vw] flex flex-nowrap gap-[20px] p-[12px] border-b-[2px]">
+            <img :src="p.image" class="w-[50px] h-[50px]" />
+            <p class="text-[14px] text-left font-bold text-[#7a7a7a] w-2/5 py-3">
+              {{ p.product_name }}
+            </p>
+            <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5 py-3">
+              {{ Helper.formatCurrency(p.price) }}
+            </p>
+            <div
+              class="flex items-center w-1/5 border-[1px] border-[#7a7a7a] rounded-[4px] h-[40px] py-3"
+            >
+              <!-- Nút trừ -->
+              <button
+                class="px-2 py-1 hover:bg-gray-300 text-[14px] font-bold w-1/3 h-[38px] rounded-[4px]"
+                @click="updateQuantity(p, -1)"
+              >
+                -
+              </button>
+
+              <!-- Hiển thị số lượng -->
+              <p
+                id="quantityDisplay"
+                class="py-2 text-[14px] text-center font-bold text-[#7a7a7a] w-1/3 border-[1px] border-[#7a7a7a] h-[40px]"
+              >
+                {{ p.quantity }}
+              </p>
+
+              <!-- Nút cộng -->
+              <button
+                class="px-2 py-1 hover:bg-gray-300 text-[14px] font-bold w-1/3 h-[38px] rounded-[4px]"
+                @click="updateQuantity(p, 1)"
+              >
+                +
+              </button>
+            </div>
+
+            <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5 py-3">
+              {{ Helper.formatCurrency(p.total) }}
+            </p>
+            <p
+              class="text-[14px] text-center font-bold text-[#7a7a7a] w-1/5 cursor-pointer py-3"
+              @click="deleteProduct(index)"
+            >
+              Xóa
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <InvoiceOrder :itemSelect="itemSelect"></InvoiceOrder>
+  </div>
+</template>

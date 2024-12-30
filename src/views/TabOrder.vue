@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import IconAddTab from '@/components/icons/IconAddTab.vue'
 import IconDeleteTab from '@/components/icons/IconDeleteTab.vue'
+import More from '@/components/icons/More.vue'
 import TheWelcome from '@/components/TheWelcome.vue'
 import InvoiceOrder from './InvoiceOrder.vue'
 import { Helper } from '../helper.js'
@@ -21,6 +22,7 @@ interface Item {
 }
 // Import các thành phần cần dùng
 const components = {
+  More,
   InvoiceOrder,
   IconAddTab,
   IconDeleteTab,
@@ -161,7 +163,7 @@ const deleteProduct = (index: number) => {
 }
 </script>
 <template>
-  <div class="h-[50px] bg-blue w-full">
+  <div class="h-[50px] bg-[#0090da] w-full">
     <div class="flex gap-4 ml-[20vw] pt-[15px]">
       <div
         v-for="(n, index) in items"
@@ -186,9 +188,9 @@ const deleteProduct = (index: number) => {
       <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-[5px]" />
     </div>
   </div>
-  <div class="flex">
+  <div class="flex" style="height: calc(100vh - 130px); max-height: calc(100vh-130px)">
     <TheWelcome></TheWelcome>
-    <div class="pl-[20px] ml-[70px] max-w-[70vw]">
+    <div class="pl-[20px] ml-[75px] max-w-[70vw] bg-white">
       <div class="">
         <div class="w-[70vw] flex flex-nowrap gap-[20px] p-[12px] border-b-[2px]">
           <p class="text-[14px] text-left font-bold text-[#7a7a7a] w-2/5 ml-[70px]">
@@ -253,5 +255,27 @@ const deleteProduct = (index: number) => {
       </div>
     </div>
     <InvoiceOrder :itemSelect="itemSelect"></InvoiceOrder>
+  </div>
+  <div class="ml-[75px] max-w-[70vw] h-full bg-white bg-bule-200">
+    <div class="ml-4 px-4 border-t p-2 pl-2"></div>
+    <button class="ml-4 flex items-center border border-gray-300 rounded-md p-2 hover:bg-gray-100">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-5 h-5 text-gray-600"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+      </svg>
+      <span class="ml-2 text-gray-700">Danh sách sản phẩm</span>
+      <More class="ml-2"></More>
+    </button>
   </div>
 </template>

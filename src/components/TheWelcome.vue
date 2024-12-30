@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed bg-gray-200 p-4 rounded-lg shadow-lg flex flex-col items-center justify-center w-[75px] gap-4 z-1000"
+    class="fixed bg-gray-200 p-4 rounded-lg flex flex-col items-center justify-center w-[75px] gap-4 z-1000 no-scrollbar"
   >
     <a class="p-[12px]" style="border-radius: 8px; background-color: white" title="Bán hàng">
       <svg

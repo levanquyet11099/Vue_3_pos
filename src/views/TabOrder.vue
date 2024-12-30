@@ -164,28 +164,63 @@ const deleteProduct = (index: number) => {
 </script>
 <template>
   <div class="h-[50px] bg-[#0090da] w-full">
-    <div class="flex gap-4 ml-[20vw] pt-[15px]">
+    <div class="flex">
       <div
-        v-for="(n, index) in items"
-        :key="n.key"
-        :text="`Item ${n.title}`"
-        :value="n.title"
-        class="bg-white rounded-t-[10px] w-[120px] cursor-pointer items-center justify-center h-[35px] text-center flex"
-        :class="{ 'opacity-50': tab !== index }"
+        class="flex items-center bg-gray-200 rounded-full p-2 ml-[20px] max-w-[20vw] h-[35px] mt-[12px]"
       >
-        <div class="flex no-wrap text-center pt-[5px]">
-          <div @click="changeTab(index)">{{ n.title }}</div>
-
-          <button
-            v-if="index != 0"
-            @click="deleteTab(index)"
-            class="hover:bg-gray-200 hover:rounded-lg ml-2"
+        <input
+          type="text"
+          class="flex-grow bg-transparent border-none outline-none px-4 py-2 rounded-l-full placeholder-gray-600"
+          placeholder="Nhập mã, tên sản phẩm (F3)"
+        />
+        <button class="text-gray-700 text-[24px] font-bold rounded-full px-4 py-2 ml-2">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <IconDeleteTab></IconDeleteTab>
-          </button>
-        </div>
+            <path
+              d="M12 5V19"
+              stroke="#7A7A7A"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M5 12H19"
+              stroke="#7A7A7A"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
       </div>
-      <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-[5px]" />
+      <div class="flex gap-4 ml-[100px] pt-[15px]">
+        <div
+          v-for="(n, index) in items"
+          :key="n.key"
+          :text="`Item ${n.title}`"
+          :value="n.title"
+          class="bg-white rounded-t-[10px] w-[120px] cursor-pointer items-center justify-center h-[35px] text-center flex"
+          :class="{ 'opacity-50': tab !== index }"
+        >
+          <div class="flex no-wrap text-center pt-[5px]">
+            <div @click="changeTab(index)">{{ n.title }}</div>
+
+            <button
+              v-if="index != 0"
+              @click="deleteTab(index)"
+              class="hover:bg-gray-200 hover:rounded-lg ml-2"
+            >
+              <IconDeleteTab></IconDeleteTab>
+            </button>
+          </div>
+        </div>
+        <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-[5px]" />
+      </div>
     </div>
   </div>
   <div class="flex" style="height: calc(100vh - 130px); max-height: calc(100vh-130px)">

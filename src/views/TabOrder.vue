@@ -1,5 +1,11 @@
 <script lang="ts" setup>
 import IconAddTab from '@/components/icons/IconAddTab.vue'
+import InforUser from './InforUser.vue'
+import IconZoomOut from '@/components/icons/IconZoomOut.vue'
+import IconForsquater from '@/components/icons/IconForSquater.vue'
+import IconDelete1 from '@/components/icons/IconDelete1.vue'
+import IconAdd from '@/components/icons/IconAdd.vue'
+import IconSearch from '@/components/icons/IconSearch.vue'
 import IconDeleteTab from '@/components/icons/IconDeleteTab.vue'
 import More from '@/components/icons/More.vue'
 import TheWelcome from '@/components/TheWelcome.vue'
@@ -12,17 +18,26 @@ interface Product {
   image: string
   product_name: string
   price: number
+  price_sale: number
   quantity: number
   total: number
+  sku: string
+  atributte: string
 }
 interface Item {
   title: string
   key: number
   products: Product[]
 }
+
 // Import các thành phần cần dùng
 const components = {
   More,
+  IconZoomOut,
+  IconSearch,
+  InforUser,
+  IconDelete1,
+  IconAdd,
   InvoiceOrder,
   IconAddTab,
   IconDeleteTab,
@@ -30,6 +45,7 @@ const components = {
 }
 
 // Reactive dữ liệu của component
+const showProduct = ref(false)
 const tab = ref(0)
 const items = reactive<Item[]>([
   {
@@ -40,17 +56,23 @@ const items = reactive<Item[]>([
         id: 12,
         image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
         product_name: 'name_product',
-        price: 1000,
+        price: 0,
+        price_sale: 70000,
         quantity: 1,
         total: 1000,
+        sku: 'sku1',
+        atributte: 'atributte1',
       },
       {
         id: 13,
         image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
         product_name: 'name_product1',
         price: 1001,
+        price_sale: 70000,
         quantity: 1,
         total: 1001,
+        sku: 'sku2',
+        atributte: 'atributte2',
       },
     ],
   },
@@ -63,8 +85,11 @@ const items = reactive<Item[]>([
         image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
         product_name: 'name_product11',
         price: 1000,
+        price_sale: 70000,
         quantity: 1,
         total: 1000,
+        sku: 'sku3',
+        atributte: 'atributte3',
       },
     ],
   },
@@ -77,8 +102,11 @@ const items = reactive<Item[]>([
         image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
         product_name: 'name_product2',
         price: 1000,
+        price_sale: 70000,
         quantity: 1,
         total: 1000,
+        sku: 'sku4',
+        atributte: 'atributte4',
       },
     ],
   },
@@ -91,8 +119,11 @@ const items = reactive<Item[]>([
         image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
         product_name: 'name_product3',
         price: 1000,
+        price_sale: 70000,
         quantity: 1,
         total: 1000,
+        sku: 'sku5',
+        atributte: 'atributte5',
       },
     ],
   },
@@ -107,6 +138,9 @@ const items = reactive<Item[]>([
         price: 1000,
         quantity: 1,
         total: 1000,
+        price_sale: 70000,
+        sku: 'sku6',
+        atributte: 'atributte6',
       },
     ],
   },
@@ -141,7 +175,9 @@ const addTab = () => {
   tab.value = items.length - 1
   itemSelect.value = items[tab.value]
 }
-
+const deleteAll = (item: Item) => {
+  item.products = []
+}
 const deleteTab = async (index: number) => {
   if (index <= 0) return // Không cho phép xóa tab đầu tiên
 
@@ -163,39 +199,23 @@ const deleteProduct = (index: number) => {
 }
 </script>
 <template>
-  <div class="h-[50px] bg-[#0090da] w-full">
+  <div class="h-[52px] w-full" style="background: linear-gradient(90deg, #1f83c9 0%, #a940bb 100%)">
     <div class="flex">
+      <img
+        src="https://salekit.com/assets/pos1/img/icon-salekit-06.2ad457de.png"
+        class="w-[39px] h-[39px] ml-[20px] mt-[6px]"
+      />
       <div
-        class="flex items-center bg-gray-200 rounded-full p-2 ml-[20px] max-w-[20vw] h-[35px] mt-[12px]"
+        class="flex items-center bg-gray-200 rounded-full p-2 ml-[15px] max-w-[22vw] w-full h-[35px] mt-[12px]"
       >
+        <IconSearch></IconSearch>
         <input
           type="text"
-          class="flex-grow bg-transparent border-none outline-none px-4 py-2 rounded-l-full placeholder-gray-600"
+          class="flex-grow bg-transparent border-none outline-none px-2 py-2 rounded-l-full placeholder-gray-600"
           placeholder="Nhập mã, tên sản phẩm (F3)"
         />
         <button class="text-gray-700 text-[24px] font-bold rounded-full px-4 py-2 ml-2">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 5V19"
-              stroke="#7A7A7A"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M5 12H19"
-              stroke="#7A7A7A"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <a href="https://salekit.com/product/create/" target="_blank"> <IconAdd></IconAdd></a>
         </button>
       </div>
       <div class="flex gap-4 ml-[100px] pt-[15px]">
@@ -204,7 +224,7 @@ const deleteProduct = (index: number) => {
           :key="n.key"
           :text="`Item ${n.title}`"
           :value="n.title"
-          class="bg-white rounded-t-[10px] w-[120px] cursor-pointer items-center justify-center h-[35px] text-center flex"
+          class="bg-white rounded-t-[10px] w-[120px] cursor-pointer items-center justify-center h-[37px] text-center flex"
           :class="{ 'opacity-50': tab !== index }"
         >
           <div class="flex no-wrap text-center pt-[5px]">
@@ -221,13 +241,19 @@ const deleteProduct = (index: number) => {
         </div>
         <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-[5px]" />
       </div>
+      <InforUser></InforUser>
     </div>
   </div>
-  <div class="flex" style="height: calc(100vh - 130px); max-height: calc(100vh-130px)">
+  <div class="flex bg-gray-200">
     <TheWelcome></TheWelcome>
-    <div class="pl-[20px] ml-[75px] max-w-[70vw] bg-white">
-      <div class="">
-        <div class="w-[70vw] flex flex-nowrap gap-[20px] p-[12px] border-b-[2px]">
+    <div
+      class="pl-[20px] ml-[75px] max-w-[70vw] mt-[16px] rounded-[8px] bg-white"
+      style="height: calc(100vh - 84px); max-height: calc(100vh - 84px)"
+    >
+      <div class="bg-white pt-[4px] pr-[16px] rounded-[8px] h-full">
+        <div
+          class="flex flex-nowrap gap-[20px] p-[12px] border-b-[2px] mt-[12px] bg-gray-200 rounded-[8px]"
+        >
           <p class="text-[14px] text-left font-bold text-[#7a7a7a] w-2/5 ml-[70px]">
             Sản phẩm
             {{ itemSelect?.products?.length ? '(' + itemSelect.products.length + ') ' : '' }}
@@ -235,82 +261,96 @@ const deleteProduct = (index: number) => {
           <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5">Giá bán</p>
           <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-1/5">Số lượng</p>
           <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5">Thành tiền</p>
-          <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-1/5">Xóa</p>
+          <p
+            class="text-[14px] text-center font-bold text-red-500 w-1/5 cursor-pointer hover:bg-white rounded-[12px]"
+            @click="deleteAll(itemSelect)"
+          >
+            Xóa tất cả
+          </p>
         </div>
-      </div>
-      <div v-if="itemSelect && itemSelect.products" class="">
-        <div v-for="(p, index) in itemSelect.products" :key="p.id" :value="p.id">
-          <div class="w-[70vw] flex flex-nowrap gap-[20px] p-[12px] border-b-[2px]">
-            <img :src="p.image" class="w-[50px] h-[50px]" />
-            <p class="text-[14px] text-left font-bold text-[#7a7a7a] w-2/5 py-3">
-              {{ p.product_name }}
-            </p>
-            <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5 py-3">
-              {{ Helper.formatCurrency(p.price) }}
-            </p>
+        <div
+          v-if="itemSelect && itemSelect.products"
+          class=""
+          style="height: 86%; max-height: aclc(85% -40px)"
+        >
+          <div v-for="(p, index) in itemSelect.products" :key="p.id" :value="p.id">
             <div
-              class="flex items-center w-1/5 border-[1px] border-[#7a7a7a] rounded-[4px] h-[40px] py-3"
+              class="w-[70vw] flex flex-nowrap gap-[20px] p-[12px] border-b-[2px] pr-[16px]"
+              style="width: calc(70vw - 32px)"
             >
-              <!-- Nút trừ -->
-              <button
-                class="px-2 py-1 hover:bg-gray-300 text-[14px] font-bold w-1/3 h-[38px] rounded-[4px]"
-                @click="updateQuantity(p, -1)"
-              >
-                -
-              </button>
-
-              <!-- Hiển thị số lượng -->
-              <p
-                id="quantityDisplay"
-                class="py-2 text-[14px] text-center font-bold text-[#7a7a7a] w-1/3 border-[1px] border-[#7a7a7a] h-[40px]"
-              >
-                {{ p.quantity }}
+              <img :src="p.image" class="w-[50px] h-[50px]" />
+              <p class="text-[14px] text-left font-bold text-[#7a7a7a] w-2/5 py-3">
+                {{ p.product_name }}
               </p>
-
-              <!-- Nút cộng -->
-              <button
-                class="px-2 py-1 hover:bg-gray-300 text-[14px] font-bold w-1/3 h-[38px] rounded-[4px]"
-                @click="updateQuantity(p, 1)"
+              <div class="w-2/5 text-[14px] text-center">
+                <p class="text-[#428BCA]" :class="{ 'py-3': !p.price }">
+                  {{ Helper.formatCurrency(p.price_sale) }}
+                </p>
+                <p v-if="p.price" class="text-gray-500 line-through">
+                  {{ Helper.formatCurrency(p.price) }}
+                </p>
+              </div>
+              <div
+                class="flex items-center w-1/5 border-[1px] border-[#7a7a7a] rounded-[4px] h-[40px] py-3"
               >
-                +
-              </button>
-            </div>
+                <!-- Nút trừ -->
+                <button
+                  class="px-2 py-1 hover:bg-gray-300 text-[14px] font-bold w-1/3 h-[38px] rounded-l-[4px]"
+                  @click="updateQuantity(p, -1)"
+                >
+                  -
+                </button>
 
-            <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5 py-3">
-              {{ Helper.formatCurrency(p.total) }}
-            </p>
-            <p
-              class="text-[14px] text-center font-bold text-[#7a7a7a] w-1/5 cursor-pointer py-3"
-              @click="deleteProduct(index)"
+                <!-- Hiển thị số lượng -->
+                <p
+                  id="quantityDisplay"
+                  class="py-2 text-[14px] text-center font-bold text-[#7a7a7a] w-1/3 border-[1px] border-[#7a7a7a] h-[40px]"
+                >
+                  {{ p.quantity }}
+                </p>
+
+                <!-- Nút cộng -->
+                <button
+                  class="px-2 py-1 hover:bg-gray-300 text-[14px] font-bold w-1/3 h-[38px] rounded-r-[4px]"
+                  @click="updateQuantity(p, 1)"
+                >
+                  +
+                </button>
+              </div>
+
+              <p class="text-[14px] text-center font-bold text-[#7a7a7a] w-2/5 py-3">
+                {{ Helper.formatCurrency(p.total) }}
+              </p>
+              <div
+                class="flex items-center justify-center w-1/5 cursor-pointer py-3 h-[45px] rounded-[12px]"
+              >
+                <div
+                  @click="deleteProduct(index)"
+                  class="w-1/3 h-[45px] flex items-center justify-center hover:bg-gray-200 rounded-[12px]"
+                >
+                  <IconDelete1 class="flex items-center justify-center"></IconDelete1>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="max-w-[70vw] bg-white bg-bule-200 rounded-b-[8px] justify-end">
+          <div class="px-4 border-t-[2px] p-2 pl-2">
+            <button
+              class="flex items-center border border-gray-300 rounded-md p-2 hover:bg-gray-100"
             >
-              Xóa
-            </p>
+              <IconForsquater></IconForsquater>
+              <span class="ml-2 text-gray-700">Danh sách sản phẩm</span>
+              <More v-if="showProduct" @click="showProduct = !showProduct" class="ml-2"></More>
+              <IconZoomOut v-else @click="showProduct = !showProduct" class="ml-2"></IconZoomOut>
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <InvoiceOrder :itemSelect="itemSelect"></InvoiceOrder>
-  </div>
-  <div class="ml-[75px] max-w-[70vw] h-full bg-white bg-bule-200">
-    <div class="ml-4 px-4 border-t p-2 pl-2"></div>
-    <button class="ml-4 flex items-center border border-gray-300 rounded-md p-2 hover:bg-gray-100">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="w-5 h-5 text-gray-600"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <rect x="3" y="3" width="7" height="7"></rect>
-        <rect x="14" y="3" width="7" height="7"></rect>
-        <rect x="3" y="14" width="7" height="7"></rect>
-        <rect x="14" y="14" width="7" height="7"></rect>
-      </svg>
-      <span class="ml-2 text-gray-700">Danh sách sản phẩm</span>
-      <More class="ml-2"></More>
-    </button>
+    <InvoiceOrder
+      :itemSelect="itemSelect"
+      style="height: calc(100vh -50px); max-height: calc(100vh)"
+    ></InvoiceOrder>
   </div>
 </template>

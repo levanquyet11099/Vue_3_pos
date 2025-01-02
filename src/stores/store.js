@@ -43,4 +43,43 @@ export const InvoiceOrder = defineStore('InvoiceOrder', {
       getTotal: (state) => state.total
   }
 });
+export const CategoryList = defineStore('CategoryList', {
+  state: () => ({
+      Category: []
+  }),
+  actions: {
+      set(category_list) {
+          this.Category = category_list
+      },
+  },
+  getters: {
+      get: (state) => state.Category
+  }
+});
+export const TrademarkList = defineStore('TrademarkList', {
+  state: () => ({
+      Trademark: []
+  }),
+  actions: {
+      set(trademark_list) {
+          this.Trademark = trademark_list
+      },
+  },
+  getters: {
+      get: (state) => state.Trademark
+  }
+});
+export const BrandList = defineStore('BrandList', {
+  state: () => ({
+      Brand: []
+  }),
+  actions: {
+      set(brand_list) {
+          this.Brand = brand_list
+      },
+  },
+  getters: {
+      get: (state) => state.Brand
+  }
+});
 

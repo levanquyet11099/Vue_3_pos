@@ -7,27 +7,45 @@ class PosService {
         return axios.get(config.API_SALEKIT + "product/list", {
             headers: {
                 "Content-type": "application/json",
-                "shop-id":88
+                "shop-id":104
             }
         });
     }
-    getProduct(id) {
-        return http.get(`/products/${id}`);
+   
+    trademark() {
+        return axios.get(config.API_SALEKIT +`trademark/list`,{
+            headers: {
+                "Content-type": "application/json",
+                "shop-id":104
+            }
+        });
     }
-    createProduct(data) {
-        return http.post("/products", data);
+    category() {
+        return axios.get(config.API_SALEKIT +`category/list`,{
+            headers: {
+                "Content-type": "application/json",
+                "shop-id":104
+            }
+        });
     }
-    updateProduct(id, data) {
-        return http.put(`/products/${id}`, data);
+    //https://api.salekit.com:3039/api/v1/brand/list?user_id=36225
+    brand() {
+        return axios.get(config.API_SALEKIT +`brand/list?user_id=36225`,{
+            headers: {
+                "Content-type": "application/json",
+                "shop-id":104
+            }
+        });
     }
-    deleteProduct(id) {
-        return http.delete(`/products/${id}`);
+    //https://api.salekit.com:3039/api/v1/customer/search?keywords=a
+    customer(keywords) {
+        return axios.get(config.API_SALEKIT +`customer/search?keywords=`+keywords,{
+            headers: {
+                "Content-type": "application/json",
+                "shop-id":104
+            }
+        });
     }
-    deleteAllProducts() {
-        return http.delete(`/products`);
-    }
-    findByTitle(title) {
-        return http.get(`/products?title=${title}`);
-    }
+
 }
 export default new PosService();

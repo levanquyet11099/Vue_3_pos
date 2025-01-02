@@ -7,13 +7,38 @@
     <div class="flex-grow">
       <!-- Search Customer -->
       <div class="flex items-center border px-2 py-1 mb-4 pt-0 rounded-full">
-        <IconSearch class="text-gray-500"></IconSearch>
+        <!-- <IconSearch class="text-gray-500"></IconSearch>
         <input
+          v-model="keywords"
           type="text"
           placeholder="Tìm khách hàng theo tên, sđt (F4)"
           class="flex-grow focus:outline-none px-2 py-1"
+          @change="searchCustomer"
         />
-        <IconAdd class="text-blue-500 ml-2 cursor-pointer"></IconAdd>
+        <IconAdd class="text-blue-500 ml-2 cursor-pointer"></IconAdd> -->
+        <div class="flex items-center border px-2 py-1 mb-4 pt-0 rounded-full">
+          <IconSearch class="text-gray-500"></IconSearch>
+          <input
+            v-model="keywords"
+            type="text"
+            placeholder="Tìm khách hàng theo tên, sđt (F4)"
+            class="flex-grow focus:outline-none px-2 py-1"
+            @input="searchCustomer"
+          />
+          <IconAdd class="text-blue-500 ml-2 cursor-pointer"></IconAdd>
+        </div>
+        <multiselect
+          v-if="searchResults.length"
+          v-model="selectedCustomer"
+          :options="searchResults"
+          :searchable="true"
+          :close-on-select="true"
+          :show-labels="false"
+          placeholder="Chọn khách hàng"
+          label="fullname"
+          track-by="id"
+          class="w-full min-w-[200px]"
+        ></multiselect>
       </div>
 
       <!-- Total Products -->
@@ -114,7 +139,13 @@ import IconSearch from '@/components/icons/IconSearch.vue'
 import IconDown2 from '@/components/icons/IconDown2.vue'
 import { ref, computed, watch } from 'vue'
 import { Helper } from '../helper.js'
+import Posservice from '@/service/Posservice.js'
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.min.css'
 
+const keywords = ref('')
+let searchResults = ref([])
+const selectedCustomer = ref(null)
 // Định nghĩa props
 const props = defineProps({
   itemSelect: {
@@ -126,6 +157,15 @@ const components = {
   IconAdd,
   IconSearch,
   IconDown2,
+  Multiselect,
+}
+const searchCustomer = () => {
+  // Gọi API tìm kiếm khách hàng
+  Posservice.customer(keywords.value).then((res) => {
+    // Cập nhật danh sách khách hàng
+    localItemSelect.value = res.data.data
+    searchResults.value = res.data.data
+  })
 }
 
 // Nếu bạn muốn sử dụng ref để tạo ra một biến riêng

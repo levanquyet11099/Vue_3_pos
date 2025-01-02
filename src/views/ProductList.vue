@@ -1,13 +1,46 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import IconDown from '@/components/icons/IconDown.vue'
 import { Helper } from '@/helper'
 import Posservice from '../service/Posservice'
+import { TrademarkList, CategoryList } from '../stores/store.js'
 
+interface Trademark {
+  id: number
+  code: string
+  fullname: string
+  email: string | null
+  mobile: string | null
+  address: string | null
+  company: string
+}
+interface Category {
+  id: number
+  name: string
+}
 // Khai báo các biến trạng thái
-const emit = defineEmits(['addproduct'])
-const selectedCategory = ref<string>('all')
+
+const components = {
+  IconDown,
+}
+const Trademark = TrademarkList().get
+const Category = CategoryList().get
+const selectedSupplier = ref<Trademark>({
+  id: 0,
+  code: '',
+  fullname: 'Nhà cung cấp',
+  email: '',
+  mobile: '',
+  address: '',
+  company: '',
+})
+const selectedCategory = ref<Category>({
+  id: 0,
+  name: 'Danh mục',
+})
+
 const selectedType = ref<string>('all')
-const selectedSupplier = ref<string>('all')
+const emit = defineEmits(['addproduct'])
 const products = ref<
   Array<{
     id: number
@@ -52,7 +85,6 @@ const products = ref<
 >([])
 // Lấy danh sách sản phẩm từ API
 Posservice.getProducts().then((res) => {
-  console.log(res.data)
   products.value = res.data.data
 })
 const addproduct = (product: any) => {
@@ -62,12 +94,19 @@ const addproduct = (product: any) => {
 const filteredProducts = computed(() => {
   return products.value.filter((product) => {
     return (
-      (selectedCategory.value === 'all' ||
-        product.category.some((cat) => cat.category_name === selectedCategory.value)) &&
-      (selectedSupplier.value === 'all' || product.supplier === selectedSupplier.value)
+      (selectedType.value === 'all' ||
+        (selectedType.value === 'product' && product.type === 0) ||
+        (selectedType.value === 'combo' && product.type === 5)) &&
+      (selectedCategory.value.id == 0 ||
+        product.category.some((cat) => cat.category_name === selectedCategory.value.name)) &&
+      (selectedSupplier.value.id === 0 || product.trademark === selectedSupplier.value.id)
     )
   })
 })
+
+const checktype = () => {
+  console.log(selectedType.value, selectedCategory.value, selectedSupplier.value)
+}
 </script>
  
 <script lang="ts">
@@ -79,21 +118,62 @@ export default {
   <div class="absolute bg-[#F3F3F3] rounded-[8px] h-[431px] shadow-top" style="bottom: 104px">
     <header class="flex justify-between">
       <div class="flex space-x-4 py-4 px-4">
-        <select v-model="selectedType" class="border rounded p-2 w-[104px] h-[39px]">
-          <option value="all">Tất cả</option>
-          <option value="sweater">Sản phẩm</option>
-          <option value="shirt">Combo</option>
-        </select>
-        <select v-model="selectedCategory" class="border rounded p-2 w-[200px] h-[39px]">
-          <option value="all">Danh mục</option>
-          <option value="sweater">Áo khoác</option>
-          <option value="shirt">Áo sơ mi</option>
-        </select>
-        <select v-model="selectedSupplier" class="border rounded p-2 w-[200px] h-[39px]">
-          <option value="all">Nhà cung cấp</option>
-          <option value="supplier1">Nhà cung cấp 1</option>
-          <option value="supplier2">Nhà cung cấp 2</option>
-        </select>
+        <div class="relative flex border rounded bg-white">
+          <select
+            v-model="selectedType"
+            class="pl-2 max-w-[110px] h-full appearance-none pr-8 focus:outline-none"
+          >
+            <option value="all">Tất cả</option>
+            <option value="product">Sản phẩm</option>
+            <option value="combo">Combo</option>
+          </select>
+          <IconDown
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none"
+          ></IconDown>
+        </div>
+        <div class="relative flex border rounded bg-white">
+          <select
+            v-model="selectedCategory"
+            @change="checktype()"
+            class="border rounded p-2 w-[200px] h-full appearance-none focus:outline-none"
+          >
+            <option :value="{ id: 0, name: 'Danh mục' }">Danh mục</option>
+            <option v-for="category in Category" :key="category.id" :value="category">
+              {{ category.name }}
+            </option>
+          </select>
+          <IconDown
+            class="absolute right-1 top-1/2 transform -translate-y-1/2 pointer-events-none"
+          ></IconDown>
+        </div>
+
+        <div class="relative flex border rounded bg-white">
+          <select
+            v-model="selectedSupplier"
+            @change="checktype()"
+            class="border rounded p-2 w-[200px] h-full appearance-none focus:outline-none"
+          >
+            <option
+              :value="{
+                id: 0,
+                code: '',
+                fullname: 'Nhà cung cấp',
+                email: '',
+                mobile: '',
+                address: '',
+                company: '',
+              }"
+            >
+              Nhà cung cấp
+            </option>
+            <option v-for="supplier in Trademark" :key="supplier.id" :value="supplier.id">
+              {{ supplier.fullname }}
+            </option>
+          </select>
+          <IconDown
+            class="absolute right-1 top-1/2 transform -translate-y-1/2 pointer-events-none"
+          ></IconDown>
+        </div>
       </div>
     </header>
     <div

@@ -12,7 +12,9 @@ import ProductList from './ProductList.vue'
 import TheWelcome from '@/components/TheWelcome.vue'
 import InvoiceOrder from './InvoiceOrder.vue'
 import { Helper } from '../helper.js'
-import { ref, reactive, onMounted, watchEffect, nextTick } from 'vue'
+import { ref, reactive, onMounted, watch, watchEffect, nextTick } from 'vue'
+import { TrademarkList, CategoryList } from '../stores/store.js'
+import Posservice from '../service/Posservice'
 
 interface Product {
   id: number
@@ -61,7 +63,11 @@ interface Item {
   key: number
   products: Product[]
 }
-
+let loaduser = ref(false)
+let user = defineProps(['user'])
+watch(user, (val: any) => {
+  loaduser.value = true
+})
 // Import các thành phần cần dùng
 const components = {
   More,
@@ -76,34 +82,41 @@ const components = {
   IconDeleteTab,
   TheWelcome,
 }
-
+Posservice.trademark().then((res) => {
+  const trademarks = TrademarkList()
+  trademarks.set(res.data.data)
+})
+Posservice.category().then((res) => {
+  const categories = CategoryList()
+  categories.set(res.data.data)
+})
 // Reactive dữ liệu của component
 const showProduct = ref(false)
 const tab = ref(0)
 const items = reactive<Item[]>([
   {
-    title: 'Hóa đơn',
-    key: 0,
-    products: [],
-  },
-  {
-    title: 'Hóa đơn 1',
+    title: 'Đơn 1',
     key: 1,
     products: [],
   },
   {
-    title: 'Hóa đơn 2',
+    title: 'Đơn 2',
     key: 2,
     products: [],
   },
   {
-    title: 'Hóa đơn 3',
+    title: 'Đơn 3',
     key: 3,
     products: [],
   },
   {
-    title: 'Hóa đơn 4',
+    title: 'Đơn 4',
     key: 4,
+    products: [],
+  },
+  {
+    title: 'Đơn 5',
+    key: 5,
     products: [],
   },
 ])
@@ -142,7 +155,7 @@ const addproduct = (product: Product) => {
 
 const addTab = () => {
   const maxKey = items.length ? Math.max(...items.map((item) => item.key)) : 0
-  items.push({ title: `Hóa đơn ${maxKey + 1}`, key: maxKey + 1, products: [] })
+  items.push({ title: `Đơn ${maxKey + 1}`, key: maxKey + 1, products: [] })
   tab.value = items.length - 1
   itemSelect.value = items[tab.value]
 }
@@ -150,7 +163,7 @@ const deleteAll = (item: Item) => {
   item.products = []
 }
 const deleteTab = async (index: number) => {
-  if (index <= 0) return // Không cho phép xóa tab đầu tiên
+  if (items.length <= 1) return // Không cho phép xóa tab duy nhất còn lại
 
   // Nếu xóa phần tử cuối cùng và đang được chọnchọn, chuyển tab về phần tử trước đó
   if (index === items.length - 1 && tab.value === items.length - 1) {
@@ -189,20 +202,20 @@ const deleteProduct = (index: number) => {
           <a href="https://salekit.com/product/create/" target="_blank"> <IconAdd></IconAdd></a>
         </button>
       </div>
-      <div class="flex gap-4 ml-[100px] pt-[15px]">
+      <div class="flex gap-4 ml-[100px] pt-[15px] max-w-[30vw] flex-no-wrap overflow-x-auto">
         <div
           v-for="(n, index) in items"
           :key="n.key"
           :text="`Item ${n.title}`"
           :value="n.title"
-          class="bg-white rounded-t-[10px] w-[120px] cursor-pointer items-center justify-center h-[37px] text-center flex"
+          class="bg-white rounded-t-[10px] w-[87px] min-w-[87px] cursor-pointer items-center justify-center h-[39px] text-center flex"
           :class="{ 'opacity-50': tab !== index }"
         >
           <div class="flex no-wrap text-center pt-[5px]">
             <div @click="changeTab(index)">{{ n.title }}</div>
 
             <button
-              v-if="index != 0"
+              v-if="items.length > 1"
               @click="deleteTab(index)"
               class="hover:bg-gray-200 hover:rounded-lg ml-2"
             >
@@ -210,9 +223,9 @@ const deleteProduct = (index: number) => {
             </button>
           </div>
         </div>
-        <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-[5px]" />
       </div>
-      <InforUser></InforUser>
+      <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-5 ml-4" />
+      <InforUser :user="loaduser"></InforUser>
     </div>
   </div>
   <div class="flex bg-gray-200">

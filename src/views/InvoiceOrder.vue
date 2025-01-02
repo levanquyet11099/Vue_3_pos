@@ -27,7 +27,7 @@
 
       <!-- Coupon -->
       <div class="mb-4">
-        <button class="text-blue-500 flex items-center" @click="toggleCoupon">
+        <button class="text-blue-500 flex items-center">
           Coupon
           <IconDown2 class="ml-2"></IconDown2>
         </button>
@@ -108,11 +108,11 @@
 </template>
 
 
-<script setup>
+<script lang="ts" setup>
 import IconAdd from '@/components/icons/IconAdd.vue'
 import IconSearch from '@/components/icons/IconSearch.vue'
 import IconDown2 from '@/components/icons/IconDown2.vue'
-import { ref, defineProps, computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Helper } from '../helper.js'
 
 // Định nghĩa props
@@ -146,4 +146,9 @@ watch(
     localItemSelect.value = newItem
   }
 )
+</script>
+<script   lang="ts">
+export default {
+  name: 'InvoiceOrder',
+}
 </script>

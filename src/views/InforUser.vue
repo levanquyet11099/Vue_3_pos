@@ -4,6 +4,11 @@ import IconWifi from '@/components/icons/IconWifi.vue'
 import IconOff from '@/components/icons/IconOff.vue'
 import IconDown from '@/components/icons/IconDown.vue'
 </script>
+<script  lang="ts" >
+export default {
+  name: 'InforUser',
+}
+</script>
 
 <template>
   <div class="ml-auto mr-[20px]">

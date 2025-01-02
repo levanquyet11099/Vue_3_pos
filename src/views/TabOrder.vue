@@ -8,6 +8,7 @@ import IconAdd from '@/components/icons/IconAdd.vue'
 import IconSearch from '@/components/icons/IconSearch.vue'
 import IconDeleteTab from '@/components/icons/IconDeleteTab.vue'
 import More from '@/components/icons/More.vue'
+import ProductList from './ProductList.vue'
 import TheWelcome from '@/components/TheWelcome.vue'
 import InvoiceOrder from './InvoiceOrder.vue'
 import { Helper } from '../helper.js'
@@ -15,14 +16,45 @@ import { ref, reactive, onMounted, watchEffect, nextTick } from 'vue'
 
 interface Product {
   id: number
-  image: string
   product_name: string
-  price: number
-  price_sale: number
-  quantity: number
-  total: number
+  name: string
   sku: string
-  atributte: string
+  category: Array<{
+    category_id: number
+    category_name: string
+  }>
+  price_sale: number
+  unit_price: number
+  description: string
+  slug: string
+  seo_title: string | null
+  seo_description: string
+  unit_name: string | null
+  content: string
+  photos: Array<{
+    photo: string
+    thumb: string
+  }>
+  type: number
+  licence_api_key: string | null
+  licence_api_url: string | null
+  price: number | null
+  image_json: string
+  thumb_url: string
+  external_link: string | null
+  package_height: string
+  weight: string
+  package_length: string
+  package_width: string
+  unit: Array<number>
+  store_id: number | null
+  parent_id: number
+  trademark: number
+  inventory: number | null
+  enable_order: number
+  supplier: string
+  quantity?: number
+  total?: number
 }
 interface Item {
   title: string
@@ -38,6 +70,7 @@ const components = {
   InforUser,
   IconDelete1,
   IconAdd,
+  ProductList,
   InvoiceOrder,
   IconAddTab,
   IconDeleteTab,
@@ -51,98 +84,27 @@ const items = reactive<Item[]>([
   {
     title: 'Hóa đơn',
     key: 0,
-    products: [
-      {
-        id: 12,
-        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
-        product_name: 'name_product',
-        price: 0,
-        price_sale: 70000,
-        quantity: 1,
-        total: 1000,
-        sku: 'sku1',
-        atributte: 'atributte1',
-      },
-      {
-        id: 13,
-        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
-        product_name: 'name_product1',
-        price: 1001,
-        price_sale: 70000,
-        quantity: 1,
-        total: 1001,
-        sku: 'sku2',
-        atributte: 'atributte2',
-      },
-    ],
+    products: [],
   },
   {
     title: 'Hóa đơn 1',
     key: 1,
-    products: [
-      {
-        id: 14,
-        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
-        product_name: 'name_product11',
-        price: 1000,
-        price_sale: 70000,
-        quantity: 1,
-        total: 1000,
-        sku: 'sku3',
-        atributte: 'atributte3',
-      },
-    ],
+    products: [],
   },
   {
     title: 'Hóa đơn 2',
     key: 2,
-    products: [
-      {
-        id: 16,
-        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
-        product_name: 'name_product2',
-        price: 1000,
-        price_sale: 70000,
-        quantity: 1,
-        total: 1000,
-        sku: 'sku4',
-        atributte: 'atributte4',
-      },
-    ],
+    products: [],
   },
   {
     title: 'Hóa đơn 3',
     key: 3,
-    products: [
-      {
-        id: 15,
-        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
-        product_name: 'name_product3',
-        price: 1000,
-        price_sale: 70000,
-        quantity: 1,
-        total: 1000,
-        sku: 'sku5',
-        atributte: 'atributte5',
-      },
-    ],
+    products: [],
   },
   {
     title: 'Hóa đơn 4',
     key: 4,
-    products: [
-      {
-        id: 17,
-        image: 'https://shopdunk.com/images/thumbs/0011842_midnight.webp',
-        product_name: 'name_product4',
-        price: 1000,
-        quantity: 1,
-        total: 1000,
-        price_sale: 70000,
-        sku: 'sku6',
-        atributte: 'atributte6',
-      },
-    ],
+    products: [],
   },
 ])
 const itemSelect = ref<Item | null>(null)
@@ -166,6 +128,15 @@ function updateQuantity(product: Product, change: number) {
     // if (itemSelect.value) {
     //   itemSelect.value.products[index_] = selectedProduct
     // }
+  }
+}
+const addproduct = (product: Product) => {
+  const selectedProduct = itemSelect.value?.products.find((p) => p.id === product.id)
+  if (selectedProduct) {
+    selectedProduct.quantity += 1
+    selectedProduct.total = selectedProduct.quantity * selectedProduct.price
+  } else {
+    itemSelect.value?.products.push({ ...product, quantity: 1, total: product.price })
   }
 }
 
@@ -247,7 +218,7 @@ const deleteProduct = (index: number) => {
   <div class="flex bg-gray-200">
     <TheWelcome></TheWelcome>
     <div
-      class="pl-[20px] ml-[75px] max-w-[70vw] mt-[16px] rounded-[8px] bg-white"
+      class="pl-[20px] ml-[75px] max-w-[70vw] mt-[16px] rounded-[8px] bg-white min-w-[70vw] h-[calc(100vh - 84px)]"
       style="height: calc(100vh - 84px); max-height: calc(100vh - 84px)"
     >
       <div class="bg-white pt-[4px] pr-[16px] rounded-[8px] h-full">
@@ -270,15 +241,18 @@ const deleteProduct = (index: number) => {
         </div>
         <div
           v-if="itemSelect && itemSelect.products"
-          class=""
-          style="height: 86%; max-height: aclc(85% -40px)"
+          class="overflow-y-auto overflow-x-hidden mb-4 no-scrollbar"
+          style="height: calc(84% - 16px); max-height: calc(83% -50px)"
         >
           <div v-for="(p, index) in itemSelect.products" :key="p.id" :value="p.id">
             <div
               class="w-[70vw] flex flex-nowrap gap-[20px] p-[12px] border-b-[2px] pr-[16px]"
               style="width: calc(70vw - 32px)"
             >
-              <img :src="p.image" class="w-[50px] h-[50px]" />
+              <img
+                :src="p.thumb_url || 'https://static.salekit.com//public/images/no-image.png'"
+                class="w-[56px] h-[56px] min-w-[56px] min-h-[56px]"
+              />
               <p class="text-[14px] text-left font-bold text-[#7a7a7a] w-2/5 py-3">
                 {{ p.product_name }}
               </p>
@@ -334,15 +308,22 @@ const deleteProduct = (index: number) => {
             </div>
           </div>
         </div>
-        <div class="max-w-[70vw] bg-white bg-bule-200 rounded-b-[8px] justify-end">
-          <div class="px-4 border-t-[2px] p-2 pl-2">
+        <ProductList
+          style="max-width: calc(70vw - 40px); width: calc(70vw - 40px); position: absolute"
+          v-if="showProduct"
+          @addproduct="addproduct"
+        ></ProductList>
+        <!-- button open popup product list -->
+        <div class="max-w-[70vw] rounded-b-[8px] justify-end relative">
+          <div class="border-t-[2px] pt-[16px]">
             <button
+              @click="showProduct = !showProduct"
               class="flex items-center border border-gray-300 rounded-md p-2 hover:bg-gray-100"
             >
               <IconForsquater></IconForsquater>
               <span class="ml-2 text-gray-700">Danh sách sản phẩm</span>
-              <More v-if="showProduct" @click="showProduct = !showProduct" class="ml-2"></More>
-              <IconZoomOut v-else @click="showProduct = !showProduct" class="ml-2"></IconZoomOut>
+              <More v-if="showProduct" class="ml-2"></More>
+              <IconZoomOut v-else class="ml-2"></IconZoomOut>
             </button>
           </div>
         </div>

@@ -15,6 +15,7 @@ import { Helper } from '../helper.js'
 import { ref, reactive, onMounted, watch, watchEffect, nextTick } from 'vue'
 import { TrademarkList, CategoryList } from '../stores/store.js'
 import Posservice from '../service/Posservice'
+import Select2 from '@/components/select2/Select2.vue'
 
 interface Product {
   id: number
@@ -63,6 +64,20 @@ interface Item {
   key: number
   products: Product[]
 }
+// Removed unnecessary ProductList interface
+// const products = ref<Product | null>(null)
+const products = ref<Product[]>([])
+if (localStorage.getItem('products')) {
+  console.log('get products from local storage')
+  products.value = JSON.parse(localStorage.getItem('products') || '')
+}
+// Lấy danh sách sản phẩm từ API
+Posservice.getProducts().then((res) => {
+  console.log('get products from api')
+  products.value = res.data.data
+  localStorage.setItem('products', JSON.stringify(res.data.data))
+})
+
 let loaduser = ref(false)
 let user = defineProps(['user'])
 watch(user, (val: any) => {
@@ -81,6 +96,7 @@ const components = {
   IconAddTab,
   IconDeleteTab,
   TheWelcome,
+  Select2,
 }
 Posservice.trademark().then((res) => {
   const trademarks = TrademarkList()
@@ -121,7 +137,7 @@ const items = reactive<Item[]>([
   },
 ])
 const itemSelect = ref<Item | null>(null)
-
+const selectProduct = ref<Product | null>(null)
 // Khi component được mount, chọn tab đầu tiên
 onMounted(() => {
   itemSelect.value = items[tab.value] || null
@@ -190,9 +206,9 @@ const deleteProduct = (index: number) => {
         class="w-[39px] h-[39px] ml-[20px] mt-[6px]"
       />
       <div
-        class="flex items-center bg-gray-200 rounded-full p-2 ml-[15px] max-w-[22vw] w-full h-[35px] mt-[12px]"
+        class="flex items-center bg-white rounded-full p-2 ml-[15px] max-w-[22vw] w-full h-[35px] mt-[12px]"
       >
-        <IconSearch></IconSearch>
+        <!-- <IconSearch></IconSearch>
         <input
           type="text"
           class="flex-grow bg-transparent border-none outline-none px-2 py-2 rounded-l-full placeholder-gray-600"
@@ -200,7 +216,13 @@ const deleteProduct = (index: number) => {
         />
         <button class="text-gray-700 text-[24px] font-bold rounded-full px-4 py-2 ml-2">
           <a href="https://salekit.com/product/create/" target="_blank"> <IconAdd></IconAdd></a>
-        </button>
+        </button> -->
+        <Select2
+          v-model="selectProduct"
+          :options="products"
+          class="w-full"
+          placeholder="Nhập mã, tên sản phẩm (F3)"
+        />
       </div>
       <div class="flex gap-4 ml-[100px] pt-[15px] max-w-[30vw] flex-no-wrap overflow-x-auto">
         <div
@@ -342,9 +364,6 @@ const deleteProduct = (index: number) => {
         </div>
       </div>
     </div>
-    <InvoiceOrder
-      :itemSelect="itemSelect"
-      style="height: calc(100vh -50px); max-height: calc(100vh)"
-    ></InvoiceOrder>
+    <InvoiceOrder :itemSelect="itemSelect"></InvoiceOrder>
   </div>
 </template>

@@ -5,7 +5,15 @@ import IconOff from '@/components/icons/IconOff.vue'
 import IconDown from '@/components/icons/IconDown.vue'
 import { BrandList } from '@/stores/store'
 import { ref, onMounted, watch } from 'vue'
+import StatusNetwork from '@/components/wifi/StatusNetwork.vue'
 
+const components = {
+  IconExclamationMark,
+  IconWifi,
+  IconOff,
+  IconDown,
+  StatusNetwork,
+}
 let Brand = BrandList().get
 let selectedBrand = ref({
   id: 0,
@@ -62,7 +70,7 @@ export default {
 
         <div class="flex items-center pr-0">
           <div class="bg-[#733D96] rounded-full h-[39px] w-[39px] flex items-center justify-center">
-            <IconWifi></IconWifi>
+            <StatusNetwork></StatusNetwork>
           </div>
           <IconExclamationMark class="pl-2 h-[30px] w-[30px]"></IconExclamationMark>
         </div>

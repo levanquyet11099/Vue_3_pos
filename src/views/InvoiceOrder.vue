@@ -2,44 +2,38 @@
 <template>
   <div
     class="mx-auto bg-white rounded-lg p-4 w-full mr-[16px] ml-[16px] mt-[16px] pb-0 flex flex-col"
-    style="height: calc(100vh)"
+    style="height: calc(100vh -50px); max-height: calc(100vh - 84px)"
   >
     <div class="flex-grow">
       <!-- Search Customer -->
-      <div class="flex items-center border px-2 py-1 mb-4 pt-0 rounded-full">
-        <!-- <IconSearch class="text-gray-500"></IconSearch>
-        <input
-          v-model="keywords"
-          type="text"
-          placeholder="Tìm khách hàng theo tên, sđt (F4)"
-          class="flex-grow focus:outline-none px-2 py-1"
-          @change="searchCustomer"
-        />
-        <IconAdd class="text-blue-500 ml-2 cursor-pointer"></IconAdd> -->
-        <div class="flex items-center border px-2 py-1 mb-4 pt-0 rounded-full">
-          <IconSearch class="text-gray-500"></IconSearch>
-          <input
-            v-model="keywords"
-            type="text"
-            placeholder="Tìm khách hàng theo tên, sđt (F4)"
-            class="flex-grow focus:outline-none px-2 py-1"
-            @input="searchCustomer"
-          />
-          <IconAdd class="text-blue-500 ml-2 cursor-pointer"></IconAdd>
-        </div>
-        <multiselect
-          v-if="searchResults.length"
+      <!-- <div class="flex items-center border px-2 py-1 mb-4 pt-0 rounded-full h-[40px]"> -->
+      <div
+        class="autocomplete-container flex items-center border px-2 py-1 mb-4 pt-0 rounded-full h-[40px] space-x-2"
+      >
+        <IconSearch class="text-gray-500"></IconSearch>
+        <!-- v-input__control="'input__control '"
+          v-field_input="'field__input'"
+          v-field__field="'field__field'"
+          v-input="'input'"
+          v-list-item="'list-item'" -->
+        <v-autocomplete
           v-model="selectedCustomer"
-          :options="searchResults"
-          :searchable="true"
-          :close-on-select="true"
-          :show-labels="false"
-          placeholder="Chọn khách hàng"
-          label="fullname"
-          track-by="id"
-          class="w-full min-w-[200px]"
-        ></multiselect>
+          :items="searchResults"
+          item-text="fullname - mobile"
+          item-value="id"
+          hide-no-data
+          variant="solo"
+          theme="light"
+          class="h-[40px] w-full"
+          flat
+          placeholder="Tìm theo tên hoặc sđt"
+          @input="searchCustomer"
+        ></v-autocomplete>
+        <button class="text-blue-500 flex items-center ml-2" @click="openAddCustomer = true">
+          <IconAdd class="mr-2"></IconAdd>
+        </button>
       </div>
+      <!-- </div> -->
 
       <!-- Total Products -->
       <p class="font-semibold mb-2 flex border-t-2 pt-[16px]">
@@ -130,6 +124,7 @@
       </button>
     </footer>
   </div>
+  <AddCustomer v-if="openAddCustomer" @close="openAddCustomer = false" />
 </template>
 
 
@@ -142,9 +137,12 @@ import { Helper } from '../helper.js'
 import Posservice from '@/service/Posservice.js'
 import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
+import AddCustomer from '@/components/customer/AddCustomer.vue'
 
 const keywords = ref('')
 let searchResults = ref([])
+let loading = ref(false)
+let openAddCustomer = ref(false)
 const selectedCustomer = ref(null)
 // Định nghĩa props
 const props = defineProps({
@@ -158,13 +156,26 @@ const components = {
   IconSearch,
   IconDown2,
   Multiselect,
+  AddCustomer,
 }
-const searchCustomer = () => {
+const searchCustomer = (input) => {
+  console.log('searchCustomer', input.data)
+  if (input.data.trim() === '') {
+    searchResults.value = []
+    return
+  }
+  loading.value = true
   // Gọi API tìm kiếm khách hàng
-  Posservice.customer(keywords.value).then((res) => {
+  Posservice.customer(input.data).then((res) => {
     // Cập nhật danh sách khách hàng
-    localItemSelect.value = res.data.data
-    searchResults.value = res.data.data
+    // localItemSelect.value = res.data.data
+    searchResults.value = res.data.data.map((customer) => ({
+      ...customer,
+      title: `${customer.fullname} - ${customer.mobile}`,
+    }))
+    // searchResults.value = res.data.data
+    // console.log('searchCustomer', searchResults.value)
+    loading.value = false
   })
 }
 
@@ -192,3 +203,5 @@ export default {
   name: 'InvoiceOrder',
 }
 </script>
+<style scoped>
+</style>

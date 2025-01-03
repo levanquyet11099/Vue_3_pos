@@ -83,9 +83,15 @@ const products = ref<
     supplier: string
   }>
 >([])
+if (localStorage.getItem('products')) {
+  console.log('get products from local storage')
+  products.value = JSON.parse(localStorage.getItem('products') || '')
+}
 // Lấy danh sách sản phẩm từ API
 Posservice.getProducts().then((res) => {
+  console.log('get products from api')
   products.value = res.data.data
+  localStorage.setItem('products', JSON.stringify(res.data.data))
 })
 const addproduct = (product: any) => {
   emit('addproduct', product)
@@ -184,7 +190,7 @@ export default {
         v-for="product in filteredProducts"
         :key="product.id"
         @click="addproduct(product)"
-        class="border rounded-[8px] p-2 w-full max-w-[308.75px] h-full max-h-[104px] bg-white flex"
+        class="border rounded-[8px] p-2 w-full max-w-[308.75px] h-full max-h-[104px] bg-white flex cursor-pointer hover:shadow-lg hover:border-2"
       >
         <div>
           <img

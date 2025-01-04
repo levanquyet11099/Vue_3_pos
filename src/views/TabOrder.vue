@@ -16,6 +16,7 @@ import { ref, reactive, onMounted, watch, watchEffect, nextTick } from 'vue'
 import { TrademarkList, CategoryList } from '../stores/store.js'
 import Posservice from '../service/Posservice'
 import Select2 from '@/components/select2/Select2.vue'
+// import SelectMunti from '@/components/select2/SelectMunti.vue'
 
 interface Product {
   id: number
@@ -67,6 +68,9 @@ interface Item {
 // Removed unnecessary ProductList interface
 // const products = ref<Product | null>(null)
 const products = ref<Product[]>([])
+const products1 = ref<Product[]>([])
+const selectedProduct = ref<Product | null>(null)
+const searchResults = ref<Product[]>([])
 if (localStorage.getItem('products')) {
   console.log('get products from local storage')
   products.value = JSON.parse(localStorage.getItem('products') || '')
@@ -97,6 +101,7 @@ const components = {
   IconDeleteTab,
   TheWelcome,
   Select2,
+  // SelectMunti,
 }
 Posservice.trademark().then((res) => {
   const trademarks = TrademarkList()
@@ -138,6 +143,12 @@ const items = reactive<Item[]>([
 ])
 const itemSelect = ref<Item | null>(null)
 const selectProduct = ref<Product | null>(null)
+watch(selectedProduct, (val: Product | null) => {
+  if (val) {
+    addproduct(val)
+  }
+  selectedProduct.value = null
+})
 // Khi component được mount, chọn tab đầu tiên
 onMounted(() => {
   itemSelect.value = items[tab.value] || null
@@ -169,6 +180,21 @@ const addproduct = (product: Product) => {
   }
 }
 
+const searchProducts = (event: InputEvent) => {
+  const query = (event.target as HTMLInputElement).value
+  if (typeof query !== 'string') return
+  searchResults.value = products.value.filter(
+    (product) =>
+      product.product_name.toLowerCase().includes(query.toLowerCase()) ||
+      product.sku.toLowerCase().includes(query.toLowerCase())
+  )
+  searchResults.value = searchResults.value.map((product) => ({
+    ...product,
+    title: `${product.product_name} - ${product.sku}`,
+    value: product,
+  }))
+}
+
 const addTab = () => {
   const maxKey = items.length ? Math.max(...items.map((item) => item.key)) : 0
   items.push({ title: `Đơn ${maxKey + 1}`, key: maxKey + 1, products: [] })
@@ -181,6 +207,9 @@ const deleteAll = (item: Item) => {
 const deleteTab = async (index: number) => {
   if (items.length <= 1) return // Không cho phép xóa tab duy nhất còn lại
 
+  if (index === 0 && tab.value === 0) {
+    tab.value = 1
+  }
   // Nếu xóa phần tử cuối cùng và đang được chọnchọn, chuyển tab về phần tử trước đó
   if (index === items.length - 1 && tab.value === items.length - 1) {
     tab.value = items.length - 2 // Chuyển về phần tử kế cuối
@@ -199,61 +228,88 @@ const deleteProduct = (index: number) => {
 }
 </script>
 <template>
-  <div class="h-[52px] w-full" style="background: linear-gradient(90deg, #1f83c9 0%, #a940bb 100%)">
-    <div class="flex">
+  <div
+    class="h-[52px] w-full flex"
+    style="background: linear-gradient(90deg, #1f83c9 0%, #a940bb 100%)"
+  >
+    <div class="flex max-w-[25vw] w-full">
       <img
         src="https://salekit.com/assets/pos1/img/icon-salekit-06.2ad457de.png"
         class="w-[39px] h-[39px] ml-[20px] mt-[6px]"
       />
       <div
-        class="flex items-center bg-white rounded-full p-2 ml-[15px] max-w-[22vw] w-full h-[35px] mt-[12px]"
+        class="autocomplete-container bg-white min-w-[22vw] ml-4 mt-2 flex items-center border px-2 py-1 mb-4 pt-0 rounded-full h-[40px] space-x-2"
       >
-        <!-- <IconSearch></IconSearch>
-        <input
-          type="text"
-          class="flex-grow bg-transparent border-none outline-none px-2 py-2 rounded-l-full placeholder-gray-600"
-          placeholder="Nhập mã, tên sản phẩm (F3)"
-        />
-        <button class="text-gray-700 text-[24px] font-bold rounded-full px-4 py-2 ml-2">
-          <a href="https://salekit.com/product/create/" target="_blank"> <IconAdd></IconAdd></a>
-        </button> -->
-        <Select2
-          v-model="selectProduct"
-          :options="products"
-          class="w-full"
-          placeholder="Nhập mã, tên sản phẩm (F3)"
-        />
-      </div>
-      <div class="flex gap-4 ml-[100px] pt-[15px] max-w-[30vw] flex-no-wrap overflow-x-auto">
-        <div
-          v-for="(n, index) in items"
-          :key="n.key"
-          :text="`Item ${n.title}`"
-          :value="n.title"
-          class="bg-white rounded-t-[10px] w-[87px] min-w-[87px] cursor-pointer items-center justify-center h-[39px] text-center flex"
-          :class="{ 'opacity-50': tab !== index }"
+        <IconSearch class="text-gray-500 mt-1 ml-2"></IconSearch>
+        <v-autocomplete
+          v-model="selectedProduct"
+          :items="searchResults"
+          item-text="product_name"
+          append-icon="thumb_url"
+          hide-no-data
+          item-color="#428BCA"
+          variant="solo"
+          class="h-[40px] w-full max-w-[21vw] mt-2 ml-0"
+          flat
+          transition="v-menu__content:translateY(12px) !important"
+          min-width="17vw"
+          placeholder="Tìm theo tên hoặc sđt"
+          @input="searchProducts"
         >
-          <div class="flex no-wrap text-center pt-[5px]">
-            <div @click="changeTab(index)">{{ n.title }}</div>
-
-            <button
-              v-if="items.length > 1"
-              @click="deleteTab(index)"
-              class="hover:bg-gray-200 hover:rounded-lg ml-2"
+          <template #item="{ item }">
+            <div
+              class="flex items-center mb-3 mt-3 max-w-[21vw] overflow-x-hidden cursor-pointer hover:bg-gray-200"
+              @click="addproduct(item.value)"
             >
-              <IconDeleteTab></IconDeleteTab>
-            </button>
-          </div>
+              <img
+                :src="
+                  item.value.thumb_url || 'https://static.salekit.com//public/images/no-image.png'
+                "
+                class="w-[45px] h-[45px] mr-2 ml-2"
+              />
+              <span class="text-nowrap truncate text-[14px]"
+                >{{ item.value.product_name }} - {{ item.value.sku }}</span
+              >
+            </div>
+          </template>
+        </v-autocomplete>
+        <button class="text-blue-500 flex items-center ml-2">
+          <IconAdd class="mr-2"></IconAdd>
+        </button>
+      </div>
+    </div>
+    <div
+      class="flex gap-4 ml-[100px] pt-[15px] max-w-[30vw] flex-no-wrap overflow-x-auto overflow-y-hidden"
+    >
+      <div
+        v-for="(n, index) in items"
+        :key="n.key"
+        :text="`Item ${n.title}`"
+        :value="n.title"
+        class="bg-white rounded-t-[10px] w-[87px] min-w-[87px] cursor-pointer items-center justify-center h-[39px] text-center flex"
+        :class="{ 'opacity-50': tab !== index }"
+      >
+        <div class="flex no-wrap text-center pt-[5px]">
+          <div @click="changeTab(index)">{{ n.title }}</div>
+
+          <button
+            v-if="items.length > 1"
+            @click="deleteTab(index)"
+            class="hover:bg-gray-200 hover:rounded-lg ml-2"
+          >
+            <IconDeleteTab></IconDeleteTab>
+          </button>
         </div>
       </div>
-      <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-5 ml-4" />
-      <InforUser :user="loaduser"></InforUser>
     </div>
+    <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-5 ml-4" />
+    <InforUser :user="loaduser"></InforUser>
   </div>
+
   <div class="flex bg-gray-200">
     <TheWelcome></TheWelcome>
     <div
-      class="pl-[20px] ml-[75px] max-w-[70vw] mt-[16px] rounded-[8px] bg-white min-w-[70vw] h-[calc(100vh - 84px)]"
+      class="pl-[20px] mr-[16px] ml-[75px] max-w-[70vw] mt-[16px] rounded-[8px] bg-white min-w-[70vw] h-[calc(100vh - 84px)]"
       style="height: calc(100vh - 84px); max-height: calc(100vh - 84px)"
     >
       <div class="bg-white pt-[4px] pr-[16px] rounded-[8px] h-full">
@@ -367,3 +423,5 @@ const deleteProduct = (index: number) => {
     <InvoiceOrder :itemSelect="itemSelect"></InvoiceOrder>
   </div>
 </template>
+<style scoped>
+</style>

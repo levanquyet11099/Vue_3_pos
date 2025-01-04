@@ -5,16 +5,16 @@
     <IconOffWifi v-else class="offline-icon"></IconOffWifi>
   </div>
 </template>
-  
+
   <script lang="ts" setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import IconWifi from '../icons/IconWifi.vue'
 import IconOffWifi from '../icons/IconOffWifi.vue'
 
-const components = {
-  IconWifi,
-  IconOffWifi,
-}
+// const components = {
+//   IconWifi,
+//   IconOffWifi,
+// }
 // Khai báo các biến trạng thái
 const isOnline = ref(navigator.onLine)
 const wifiStrength = ref(0)
@@ -34,21 +34,21 @@ const getWifiStrength = () => {
 }
 
 // Class cho vạch WiFi
-const wifiStrengthClass = computed(() => {
-  if (!isOnline.value) return 'bg-gray-400' // Màu cho offline
-  switch (wifiStrength.value) {
-    case 0:
-      return 'bg-red-500'
-    case 1:
-      return 'bg-orange-500'
-    case 2:
-      return 'bg-yellow-500'
-    case 3:
-      return 'bg-green-500'
-    default:
-      return 'bg-gray-400'
-  }
-})
+// const wifiStrengthClass = computed(() => {
+//   if (!isOnline.value) return 'bg-gray-400' // Màu cho offline
+//   switch (wifiStrength.value) {
+//     case 0:
+//       return 'bg-red-500'
+//     case 1:
+//       return 'bg-orange-500'
+//     case 2:
+//       return 'bg-yellow-500'
+//     case 3:
+//       return 'bg-green-500'
+//     default:
+//       return 'bg-gray-400'
+//   }
+// })
 
 // Cài đặt sự kiện khi component được mount
 onMounted(() => {

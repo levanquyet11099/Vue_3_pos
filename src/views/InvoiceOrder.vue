@@ -20,15 +20,25 @@
           v-model="selectedCustomer"
           :items="searchResults"
           item-text="fullname - mobile"
-          item-value="id"
           hide-no-data
           variant="solo"
-          theme="light"
           class="h-[40px] w-full"
           flat
+          transition="v-menu__content:translateY(12px) !important"
           placeholder="Tìm theo tên hoặc sđt"
           @input="searchCustomer"
-        ></v-autocomplete>
+        >
+          <!-- <template #item="{ item }">
+            <div
+              class="flex items-center mb-3 ml-2 max-w-[21vw] overflow-x-hidden cursor-pointer hover:bg-gray-200"
+              @click="selectedCustomer = item.value"
+            >
+              <span class="text-nowrap truncate text-[14px]"
+                >{{ item.value.fullname }} - {{ item.value.mobile }}</span
+              >
+            </div>
+          </template> -->
+        </v-autocomplete>
         <button class="text-blue-500 flex items-center ml-2" @click="openAddCustomer = true">
           <IconAdd class="mr-2"></IconAdd>
         </button>
@@ -135,11 +145,10 @@ import IconDown2 from '@/components/icons/IconDown2.vue'
 import { ref, computed, watch } from 'vue'
 import { Helper } from '../helper.js'
 import Posservice from '@/service/Posservice.js'
-import Multiselect from 'vue-multiselect'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
 import AddCustomer from '@/components/customer/AddCustomer.vue'
 
-const keywords = ref('')
+// const keywords = ref('')
 let searchResults = ref([])
 let loading = ref(false)
 let openAddCustomer = ref(false)
@@ -151,15 +160,15 @@ const props = defineProps({
     required: false,
   },
 })
-const components = {
-  IconAdd,
-  IconSearch,
-  IconDown2,
-  Multiselect,
-  AddCustomer,
-}
+// const components = {
+//   IconAdd,
+//   IconSearch,
+//   IconDown2,
+//   Multiselect,
+//   AddCustomer,
+// }
+
 const searchCustomer = (input) => {
-  console.log('searchCustomer', input.data)
   if (input.data.trim() === '') {
     searchResults.value = []
     return
@@ -172,6 +181,7 @@ const searchCustomer = (input) => {
     searchResults.value = res.data.data.map((customer) => ({
       ...customer,
       title: `${customer.fullname} - ${customer.mobile}`,
+      value: customer,
     }))
     // searchResults.value = res.data.data
     // console.log('searchCustomer', searchResults.value)

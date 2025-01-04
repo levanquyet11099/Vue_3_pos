@@ -6,7 +6,7 @@ import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 export default [
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{js,mjs,jsx,vue}'],
+    files: ['**/*.{js,mjs,jsx,vue,ts,tsx}'],
   },
 
   {
@@ -16,7 +16,7 @@ export default [
 
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
-  
+
   {
     ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/*'],

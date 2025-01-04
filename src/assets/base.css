@@ -6,74 +6,53 @@
   }
 
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
   .shadow-top {
-    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 -4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 -2px 4px -1px rgba(0, 0, 0, 0.06);
   }
- 
-  
- 
- 
-  
 
   /* .rounded-input .v-input__control {
     border-radius: 9999px; 
   } */
-  
- 
-  .v-field{
-    --v-field-input-padding-top:10px !important;
+
+  .v-field {
+    --v-field-input-padding-top: 10px !important;
     width: 100%;
     padding-top: 0px !important;
     padding-bottom: 0px !important;
-    background-color: rgb(236, 222, 222);
-
-    
   }
- 
-  .v-input__control{
+
+  .v-input__control {
     /* margin-top: -8px; */
     padding-top: 0px !important;
     padding: 0px !important;
     /* align-items: center; */
     /* z-index: 1;
     opacity: 50%; */
-    
   }
-  .v-list-item:hover {
-    background-color: #f5f5f5 !important; /* Đặt màu nền khi hover vào tùy chọn */
-  }
-  .v-list-item{
-    background-color: #f5f5f5 !important;
-  }
-  .v-field__field{
+
+  .v-field__field {
     /* padding: 0px !important; */
     height: 30px !important;
     padding-top: 0px !important;
     padding-bottom: 16px !important;
     --v-field-input-padding-top: 0px !important;
-    
   }
-  .v-input{
+  .v-input {
     height: 40px !important;
     margin-top: 8px !important;
   }
-  .field__input{
+  .field__input {
     padding: 0px !important;
     height: 30px !important;
     width: 100%;
-    background-color: white;
     border: none;
     padding-top: 0px !important;
     min-height: 20px !important;
     /* margin-bottom: 20px !important; */
   }
-  
- 
-
-
 }
-
-

@@ -1,83 +1,101 @@
 <template>
-  <select ref="select" class="w-full">
-    <option v-for="option in options" :key="option.id" :value="option.id">
-      {{ option.text }}
-    </option>
-  </select>
+  <div class="flex">
+    <multiselect
+      v-model="selectedProduct"
+      :options="products"
+      :searchable="true"
+      :close-on-select="true"
+      :clear-on-select="true"
+      :preserve-search="true"
+      placeholder="Nhập mã, tên sản phẩm (F3)"
+      label="product_name"
+      track-by="id"
+      :custom-label="customLabel"
+      @search-change="onSearchChange"
+      class="min-w-[20vw] rounded-full h-[39px] max-w-[25vw]"
+    >
+      <template #option="props">
+        <div class="option">
+          <img
+            :src="
+              props.option.thumb_url || 'https://static.salekit.com//public/images/no-image.png'
+            "
+            class="option-image"
+          />
+          <span>{{ props.option.product_name }}</span>
+        </div>
+      </template>
+    </multiselect>
+  </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, onMounted, onBeforeUnmount, watch, toRefs } from 'vue'
-import $ from 'jquery'
-import 'select2/dist/css/select2.min.css'
-import 'select2'
+<script>
+import Multiselect from 'vue-multiselect'
+import 'vue-multiselect/dist/vue-multiselect.min.css'
 
-// Định nghĩa props
-const props = defineProps({
-  options: {
-    type: Array as PropType<Array<{ id: string | number; text: string }>>,
-    required: true,
+export default {
+  name: 'ProductSelect',
+  components: { Multiselect },
+  props: {
+    products: {
+      type: Array,
+      required: true,
+    },
+    modelValue: {
+      type: Object,
+      default: null,
+    },
   },
-  modelValue: {
-    type: [String, Number, Array],
-    default: null,
+  data() {
+    return {
+      selectedProduct: this.modelValue,
+    }
   },
-})
-const emit = defineEmits(['update:modelValue'])
-
-// refs
-const select = ref<HTMLSelectElement | null>(null)
-
-// Hàm xử lý khi lựa chọn thay đổi
-const updateValue = () => {
-  if (select.value) {
-    emit('update:modelValue', $(select.value).val())
-  }
+  watch: {
+    modelValue(val) {
+      this.selectedProduct = val
+    },
+    selectedProduct(val) {
+      this.$emit('update:modelValue', val)
+    },
+  },
+  methods: {
+    customLabel(option) {
+      return `${option.product_name} - ${option.sku}`
+    },
+    onSearchChange(searchQuery) {
+      this.$emit('search-change', searchQuery)
+    },
+  },
 }
-
-// Khởi tạo Select2
-onMounted(() => {
-  $(select.value).select2()
-
-  // Gán giá trị ban đầu
-  $(select.value).val(props.modelValue).trigger('change')
-
-  // Thêm sự kiện change
-  $(select.value).on('change', updateValue)
-})
-
-// Cập nhật giá trị khi props.modelValue thay đổi
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (select.value) {
-      $(select.value).val(newValue).trigger('change')
-    }
-  }
-)
-
-// Cập nhật lại danh sách options
-watch(
-  () => props.options,
-  (newOptions) => {
-    if (select.value) {
-      $(select.value).empty()
-      newOptions.forEach((option) => {
-        $(select.value).append(new Option(option.text, option.id))
-      })
-      $(select.value).select2() // Cập nhật select2
-    }
-  }
-)
-
-// Hủy Select2 khi component bị unmount
-onBeforeUnmount(() => {
-  if (select.value) {
-    $(select.value).select2('destroy')
-  }
-})
 </script>
 
 <style scoped>
-/* CSS nếu cần */
+.option {
+  display: flex;
+  align-items: center;
+}
+.option-image {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+.multiselect__tags {
+  border: none !important;
+  height: 35px !important;
+  min-height: 35px !important;
+}
+.multiselect__tags:hover {
+  border: none !important;
+  height: 35px !important;
+  min-height: 35px !important;
+}
+.multiselect,
+.multiselect__input,
+.multiselect__single {
+  height: 20px !important;
+}
+.multiselect__tags-wrap {
+  height: 35px !important;
+}
 </style>

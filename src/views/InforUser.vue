@@ -7,13 +7,6 @@ import { BrandList } from '@/stores/store'
 import { ref, onMounted, watch } from 'vue'
 import StatusNetwork from '@/components/wifi/StatusNetwork.vue'
 
-const components = {
-  IconExclamationMark,
-  IconWifi,
-  IconOff,
-  IconDown,
-  StatusNetwork,
-}
 let Brand = BrandList().get
 let selectedBrand = ref({
   id: 0,
@@ -21,6 +14,13 @@ let selectedBrand = ref({
   name: 'Cửa hàng 1',
   store_id: 0,
 })
+const components = {
+  IconExclamationMark,
+  IconWifi,
+  IconOff,
+  IconDown,
+  StatusNetwork,
+}
 const props = defineProps(['user'])
 watch(
   () => props.user,

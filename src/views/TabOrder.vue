@@ -249,10 +249,10 @@ const deleteProduct = (index: number) => {
           hide-no-data
           item-color="#428BCA"
           variant="solo"
-          class="h-[40px] w-full max-w-[21vw] mt-2 ml-0"
+          class="h-[40px] w-full max-w-[18vw] mt-2 ml-0"
           flat
           transition="v-menu__content:translateY(12px) !important"
-          min-width="17vw"
+          min-width="15vw"
           placeholder="Tìm theo tên hoặc sđt"
           @input="searchProducts"
         >

@@ -2,7 +2,8 @@
 import TabOrder from './TabOrder.vue'
 import { ref } from 'vue'
 import Posservice from '@/service/Posservice'
-import { BrandList } from '@/stores/store.js'
+import { BrandList,UserInfo } from '@/stores/store.js'
+import Cookies from 'js-cookie';
 
 // interface Brand {
 //   id: number
@@ -11,12 +12,21 @@ import { BrandList } from '@/stores/store.js'
 //   store_id: number
 // }
 let user = ref(false)
-Posservice.brand().then((res) => {
-  if (res.data.status === 1) {
-    BrandList().set(res.data.data)
-    user.value = true
-  }
+const token = localStorage.getItem('token')
+Posservice.userInfo(token).then((res) => {
+  if (res.data.status === 200) {
+    UserInfo().set(res.data)
+    if(res.data.user_id)
+    Posservice.brand(res.data.user_id).then((res) => {
+      if (res.data.status === 1) {
+        BrandList().set(res.data.data)
+        user.value = true
+      }
 })
+  }
+}) 
+
+ 
 </script>
 
 <template>

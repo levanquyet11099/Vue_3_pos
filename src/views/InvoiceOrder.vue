@@ -24,9 +24,11 @@
           variant="solo"
           class="h-[40px] w-full"
           flat
+          min-width=""
           transition="v-menu__content:translateY(12px) !important"
           placeholder="Tìm theo tên hoặc sđt"
           @input="searchCustomer"
+          :menu-props="{ closeOnContentClick: true, offset: [8, 33] }"
         >
           <!-- <template #item="{ item }">
             <div
@@ -129,7 +131,7 @@
       ></textarea>
 
       <!-- Payment Button -->
-      <button class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 mb-4">
+      <button class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 mb-4" @click="create_Order()">
         Thanh toán (F9)
       </button>
     </footer>
@@ -142,7 +144,8 @@
 import IconAdd from '@/components/icons/IconAdd.vue'
 import IconSearch from '@/components/icons/IconSearch.vue'
 import IconDown2 from '@/components/icons/IconDown2.vue'
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch,onMounted } from 'vue'
+import {UserInfo} from '@/stores/store'
 import { Helper } from '../helper.js'
 import Posservice from '@/service/Posservice.js'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
@@ -160,6 +163,8 @@ const props = defineProps({
     required: false,
   },
 })
+
+const isOnline = ref(navigator.onLine)
 // const components = {
 //   IconAdd,
 //   IconSearch,
@@ -188,7 +193,73 @@ const searchCustomer = (input) => {
     loading.value = false
   })
 }
+const create_Order = () => {
+  let User = UserInfo().get
+  if(!selectedCustomer.value){
+    alert('Vui lòng chọn khách hàng')
+    return
+  }
+  if(!localItemSelect.value?.products?.length){
+    alert('Vui lòng chọn sản phẩm')
+    return
+  }     
+  let products = []   
+  localItemSelect.value.products.forEach((product) => {
+    products.push({
+      price_sale: product.price_sale,
+      product_id: product.product_id,
+      product_name: product.product_name,
+      quantity: product.quantity,
+      discount: product.discount,
+    })
+  })                                                                                                                                                                                                                                                 
+  let data = {
+    store_id: 4235,
+    full_name: 'Mạnh',
+    phone: '0351234567',
+    email: 'lyquyetvanle@gmail.com',
+    note: null,
+    ship_partner_id: null,
+    utm_source: 'salekit.com',
+    ref_sub: 'salekit.com',
+    payment_method: 5,
+    pay_type: 2,
+    extra_price: 10000,
+    pay_fee: 20000,
+    discount: 44850,
+    ship_fee: 20000,
+    payment_id: 5,
+    coupon_id: 5989,
+    products:products,
+    create_by_order: 1,
+    sale_id: User.user_id,
+    // "sale_name": "quyet",
+    // "schedule_at": "",
+    user_id: 36225,
+  }
+  if(isOnline.value){
 
+    console.log('localItemSelect',localItemSelect.value,selectedCustomer.value)
+    console.log('online_same_ffline')
+    Helper.pushOrderLocal(data)
+  //   Posservice.createOrder(data).then((res) => {
+  //   console.log(res.data)
+  // })
+  }
+  else{
+    console.log('offline')
+    Helper.pushOrderLocal(data)
+  }
+
+}
+const updateStatus = () => {
+  isOnline.value = navigator.onLine
+}
+onMounted(() => {
+  window.addEventListener('online', updateStatus)
+  window.addEventListener('offline', updateStatus)
+  updateStatus()
+})
 // Nếu bạn muốn sử dụng ref để tạo ra một biến riêng
 const localItemSelect = ref(props.itemSelect)
 const discount = ref(0)

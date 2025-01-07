@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, defineProps } from 'vue'
+import { ref } from 'vue'
 // import { Helper } from '../helper.js'
 import Posservice from '@/service/Posservice.js'
 const emit = defineEmits(['save', 'close'])

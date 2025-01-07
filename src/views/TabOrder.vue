@@ -255,6 +255,7 @@ const deleteProduct = (index: number) => {
           min-width="15vw"
           placeholder="Tìm theo tên hoặc sđt"
           @input="searchProducts"
+          :menu-props="{ closeOnContentClick: true, offset: [8, 33] }"
         >
           <template #item="{ item }">
             <div

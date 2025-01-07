@@ -82,4 +82,17 @@ export const BrandList = defineStore('BrandList', {
       get: (state) => state.Brand
   }
 });
+export const UserInfo = defineStore('UserInfo', {
+    state: () => ({
+        User: {}
+    }),
+    actions: {
+        set(data) {
+            this.User = data
+        },
+    },
+    getters: {
+        get: (state) => state.User
+    }
+  });
 

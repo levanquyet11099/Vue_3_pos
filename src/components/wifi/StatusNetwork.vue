@@ -33,23 +33,6 @@ const getWifiStrength = () => {
   return -1 // -1 cho trạng thái offline
 }
 
-// Class cho vạch WiFi
-// const wifiStrengthClass = computed(() => {
-//   if (!isOnline.value) return 'bg-gray-400' // Màu cho offline
-//   switch (wifiStrength.value) {
-//     case 0:
-//       return 'bg-red-500'
-//     case 1:
-//       return 'bg-orange-500'
-//     case 2:
-//       return 'bg-yellow-500'
-//     case 3:
-//       return 'bg-green-500'
-//     default:
-//       return 'bg-gray-400'
-//   }
-// })
-
 // Cài đặt sự kiện khi component được mount
 onMounted(() => {
   window.addEventListener('online', updateStatus)

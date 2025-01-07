@@ -114,20 +114,20 @@ const checktype = () => {
   console.log(selectedType.value, selectedCategory.value, selectedSupplier.value)
 }
 </script>
- 
+
 <script lang="ts">
 export default {
   name: 'ProductList',
 }
 </script>
 <template>
-  <div class="absolute bg-[#F3F3F3] rounded-[8px] h-[431px] shadow-top" style="bottom: 104px">
+  <div class="absolute bg-[#F3F3F3] rounded-[8px] h-[439px] shadow-top" style="bottom: 122px">
     <header class="flex justify-between">
       <div class="flex space-x-4 py-4 px-4">
         <div class="relative flex border rounded bg-white">
           <select
             v-model="selectedType"
-            class="pl-2 max-w-[110px] h-full appearance-none pr-8 focus:outline-none"
+            class="pl-2 max-w-[110px] h-[39px] appearance-none pr-8 focus:outline-none"
           >
             <option value="all">Tất cả</option>
             <option value="product">Sản phẩm</option>
@@ -183,14 +183,14 @@ export default {
       </div>
     </header>
     <div
-      class="grid grid-cols-4 gap-4 p-4 pt-0 overflow-y-auto no-scrollbar"
-      style="height: calc(100% - 70px)"
+      class="grid grid-cols-4 gap-4 pr-4 pl-4 pt-0 overflow-y-auto no-scrollbar"
+      style="height: calc(100% - 98px)"
     >
       <div
         v-for="product in filteredProducts"
         :key="product.id"
         @click="addproduct(product)"
-        class="border rounded-[8px] p-2 w-full max-w-[308.75px] h-full max-h-[104px] bg-white flex cursor-pointer hover:shadow-lg hover:border-2"
+        class="border rounded-[8px] p-2 w-full max-w-[308.75px] h-full max-h-[104px] h-[104px] w-[308px] bg-white flex cursor-pointer hover:shadow-lg hover:border-2"
       >
         <div>
           <img
@@ -218,4 +218,4 @@ export default {
     </div>
   </div>
 </template>
-  
+

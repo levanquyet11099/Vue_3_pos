@@ -1,14 +1,14 @@
 <template>
   <div class="wifi-status">
-    <!-- <span v-if="isOnline" :class="wifiStrengthClass" class="wifi-icon"></span> -->
-    <IconWifi v-if="isOnline"></IconWifi>
-    <IconOffWifi v-else class="offline-icon"></IconOffWifi>
+    <!-- <IconWifi v-if="isOnline"></IconWifi> -->
+    <IconOffWifi v-if="isOnline" class="offline-icon" :quantity="dynamicNumber"> </IconOffWifi>
+    <IconOffWifi v-else class="offline-icon"> </IconOffWifi>
   </div>
 </template>
 
-  <script lang="ts" setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import IconWifi from '../icons/IconWifi.vue'
+<script lang="ts" setup>
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+// import IconWifi from '../icons/IconWifi.vue'
 import IconOffWifi from '../icons/IconOffWifi.vue'
 
 // const components = {
@@ -16,9 +16,14 @@ import IconOffWifi from '../icons/IconOffWifi.vue'
 //   IconOffWifi,
 // }
 // Khai báo các biến trạng thái
+const quantityOrder = defineProps(['quantityOrder'])
+let dynamicNumber = quantityOrder.quantityOrder
 const isOnline = ref(navigator.onLine)
 const wifiStrength = ref(0)
 
+watch(quantityOrder, (newVal) => {
+  dynamicNumber = newVal.quantityOrder
+})
 // Hàm cập nhật trạng thái
 const updateStatus = () => {
   isOnline.value = navigator.onLine
@@ -47,12 +52,12 @@ onBeforeUnmount(() => {
 })
 </script>
 
-  <script lang="ts">
+<script lang="ts">
 export default {
   name: 'StatusNetwork',
 }
 </script>
-  <style scoped>
+<style scoped>
 .wifi-status {
   display: flex;
   align-items: center;

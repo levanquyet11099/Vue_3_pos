@@ -13,11 +13,23 @@ import TheWelcome from '@/components/TheWelcome.vue'
 import InvoiceOrder from './InvoiceOrder.vue'
 import { Helper } from '../helper.js'
 import { ref, reactive, onMounted, watch, watchEffect, nextTick } from 'vue'
-import { TrademarkList, CategoryList } from '../stores/store.js'
+import { TrademarkList, CategoryList, UserInfo } from '../stores/store.js'
 import Posservice from '../service/Posservice'
 import Select2 from '@/components/select2/Select2.vue'
 // import SelectMunti from '@/components/select2/SelectMunti.vue'
 
+interface User {
+  status: number
+  shop_id: string
+  user_id: number
+  avatar: string
+  brand_selected: object | null
+  point_shop: {
+    point_status: number
+    point_rate: number
+  }
+  data: string
+}
 interface Product {
   id: number
   product_name: string
@@ -67,10 +79,12 @@ interface Item {
 }
 // Removed unnecessary ProductList interface
 // const products = ref<Product | null>(null)
+
 const products = ref<Product[]>([])
 const products1 = ref<Product[]>([])
 const selectedProduct = ref<Product | null>(null)
 const searchResults = ref<Product[]>([])
+const Userinfo = ref<User>(null)
 if (localStorage.getItem('products')) {
   console.log('get products from local storage')
   products.value = JSON.parse(localStorage.getItem('products') || '')
@@ -84,9 +98,20 @@ Posservice.getProducts().then((res) => {
 
 let loaduser = ref(false)
 let user = defineProps(['user'])
+let quantityOffline = ref(0)
 watch(user, (val: any) => {
   loaduser.value = true
+  Userinfo.value = UserInfo().get as User
+  quantityOffline = localStorage.getItem('orderListOffline_' + Userinfo?.value?.shop_id)
+    .length as any
+  console.log(
+    'quantityOffline',
+    quantityOffline,
+    Userinfo?.value?.shop_id,
+    localStorage.getItem('orderListOffline_' + Userinfo?.value?.shop_id).length,
+  )
 })
+
 // Import các thành phần cần dùng
 const components = {
   More,
@@ -123,21 +148,6 @@ const items = reactive<Item[]>([
   {
     title: 'Đơn 2',
     key: 2,
-    products: [],
-  },
-  {
-    title: 'Đơn 3',
-    key: 3,
-    products: [],
-  },
-  {
-    title: 'Đơn 4',
-    key: 4,
-    products: [],
-  },
-  {
-    title: 'Đơn 5',
-    key: 5,
     products: [],
   },
 ])
@@ -186,7 +196,7 @@ const searchProducts = (event: InputEvent) => {
   searchResults.value = products.value.filter(
     (product) =>
       product.product_name.toLowerCase().includes(query.toLowerCase()) ||
-      product.sku.toLowerCase().includes(query.toLowerCase())
+      product.sku.toLowerCase().includes(query.toLowerCase()),
   )
   searchResults.value = searchResults.value.map((product) => ({
     ...product,
@@ -204,7 +214,20 @@ const addTab = () => {
 const deleteAll = (item: Item) => {
   item.products = []
 }
-const deleteTab = async (index: number) => {
+const createOrderSusccess = (data: boolean) => {
+  if (data) {
+    const tabdelete = tab.value
+    if (items.length === 1) {
+      addTab()
+      deleteTab(tabdelete)
+    } else {
+      deleteTab(tab.value)
+    }
+
+    quantityOffline.value += 1
+  }
+}
+const deleteTab = (index: number) => {
   if (items.length <= 1) return // Không cho phép xóa tab duy nhất còn lại
 
   if (index === 0 && tab.value === 0) {
@@ -304,7 +327,7 @@ const deleteProduct = (index: number) => {
       </div>
     </div>
     <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-5 ml-4" />
-    <InforUser :user="loaduser"></InforUser>
+    <InforUser :user="loaduser" :quantityOffline="quantityOffline"></InforUser>
   </div>
 
   <div class="flex bg-gray-200">
@@ -421,8 +444,10 @@ const deleteProduct = (index: number) => {
         </div>
       </div>
     </div>
-    <InvoiceOrder :itemSelect="itemSelect"></InvoiceOrder>
+    <InvoiceOrder
+      :itemSelect="itemSelect"
+      @createOrderSusccess="createOrderSusccess"
+    ></InvoiceOrder>
   </div>
 </template>
-<style scoped>
-</style>
+<style scoped></style>

@@ -2,6 +2,9 @@ import js from '@eslint/js'
 import pluginVue from 'eslint-plugin-vue'
 import pluginVitest from '@vitest/eslint-plugin'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
+// import pluginTypeScript from '@typescript-eslint/eslint-plugin'
+// import parserTypeScript from '@typescript-eslint/parser'
+// import vueEslintParser from 'vue-eslint-parser'
 
 export default [
   {
@@ -22,4 +25,22 @@ export default [
     files: ['src/**/__tests__/*'],
   },
   skipFormatting,
+  // {
+  //   files: ['**/*.{ts,tsx,vue}'],
+  //   languageOptions: {
+  //     parser: vueEslintParser,
+  //     parserOptions: {
+  //       parser: parserTypeScript,
+  //       ecmaVersion: 2021,
+  //       sourceType: 'module',
+  //       extraFileExtensions: ['.vue'],
+  //     },
+  //   },
+  //   plugins: {
+  //     '@typescript-eslint': pluginTypeScript,
+  //   },
+  //   rules: {
+  //     ...pluginTypeScript.configs.recommended.rules,
+  //   },
+  // },
 ]

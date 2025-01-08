@@ -1,4 +1,3 @@
-
 <template>
   <div
     class="mx-auto bg-white rounded-lg p-4 w-full mr-[16px] ml-[16px] mt-[16px] pb-0 flex flex-col"
@@ -72,8 +71,8 @@
       <div class="flex justify-between items-center mb-4">
         <span class="">Chiết khấu</span>
         <input
-          v-model="discount"
-          type="text"
+          v-model.number="discount"
+          type="number"
           class="rounded px-2 py-1 w-1/4 ml-2 text-right border-b-2 focus:outline-none"
           placeholder="0"
         />
@@ -131,7 +130,10 @@
       ></textarea>
 
       <!-- Payment Button -->
-      <button class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 mb-4" @click="create_Order()">
+      <button
+        class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 mb-4"
+        @click="create_Order()"
+      >
         Thanh toán (F9)
       </button>
     </footer>
@@ -139,23 +141,34 @@
   <AddCustomer v-if="openAddCustomer" @close="openAddCustomer = false" />
 </template>
 
-
 <script lang="ts" setup>
 import IconAdd from '@/components/icons/IconAdd.vue'
 import IconSearch from '@/components/icons/IconSearch.vue'
 import IconDown2 from '@/components/icons/IconDown2.vue'
-import { ref, computed, watch,onMounted } from 'vue'
-import {UserInfo} from '@/stores/store'
+import { ref, computed, watch, onMounted } from 'vue'
+import { UserInfo } from '@/stores/store'
 import { Helper } from '../helper.js'
 import Posservice from '@/service/Posservice.js'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
 import AddCustomer from '@/components/customer/AddCustomer.vue'
 
 // const keywords = ref('')
+const emit = defineEmits(['createOrderSusccess'])
 let searchResults = ref([])
 let loading = ref(false)
 let openAddCustomer = ref(false)
-const selectedCustomer = ref(null)
+interface Customer {
+  id: number
+  fullname: string
+  mobile: string
+  email: string
+  address: string
+  point: number
+}
+
+const selectedCustomer = ref<Customer>(null)
+const discount = ref(0)
+const storeUser = UserInfo()
 // Định nghĩa props
 const props = defineProps({
   itemSelect: {
@@ -163,17 +176,37 @@ const props = defineProps({
     required: false,
   },
 })
+const localItemSelect = ref(props.itemSelect)
 
+interface User {
+  status: number
+  shop_id: string
+  user_id: number
+  avatar: string
+  brand_selected: object | null
+  point_shop: {
+    point_status: number
+    point_rate: number
+  }
+  data: string
+}
+
+let User_data = ref<User>({
+  status: 0,
+  shop_id: '',
+  user_id: 0,
+  avatar: '',
+  brand_selected: null,
+  point_shop: {
+    point_status: 0,
+    point_rate: 0,
+  },
+  data: '',
+})
+// let User = UserInfo().get
 const isOnline = ref(navigator.onLine)
-// const components = {
-//   IconAdd,
-//   IconSearch,
-//   IconDown2,
-//   Multiselect,
-//   AddCustomer,
-// }
 
-const searchCustomer = (input) => {
+const searchCustomer = (input: { data: string }) => {
   if (input.data.trim() === '') {
     searchResults.value = []
     return
@@ -183,7 +216,7 @@ const searchCustomer = (input) => {
   Posservice.customer(input.data).then((res) => {
     // Cập nhật danh sách khách hàng
     // localItemSelect.value = res.data.data
-    searchResults.value = res.data.data.map((customer) => ({
+    searchResults.value = res.data.data.map((customer: Customer) => ({
       ...customer,
       title: `${customer.fullname} - ${customer.mobile}`,
       value: customer,
@@ -193,64 +226,69 @@ const searchCustomer = (input) => {
     loading.value = false
   })
 }
+
 const create_Order = () => {
-  let User = UserInfo().get
-  if(!selectedCustomer.value){
+  User_data.value = storeUser.get as User
+  if (!selectedCustomer.value) {
     alert('Vui lòng chọn khách hàng')
     return
   }
-  if(!localItemSelect.value?.products?.length){
+  if (!localItemSelect.value?.products?.length) {
     alert('Vui lòng chọn sản phẩm')
     return
-  }     
-  let products = []   
-  localItemSelect.value.products.forEach((product) => {
-    products.push({
-      price_sale: product.price_sale,
-      product_id: product.product_id,
-      product_name: product.product_name,
-      quantity: product.quantity,
-      discount: product.discount,
-    })
-  })                                                                                                                                                                                                                                                 
+  }
+  let products: {
+    price_sale: number
+    product_id: number
+    product_name: string
+    quantity: number
+    discount: number
+  }[] = []
+  // console.log('localItemSelect', localItemSelect.value)
+  localItemSelect.value.products.forEach(
+    (product: { price_sale: number; id: number; product_name: string; quantity: number }) => {
+      products.push({
+        price_sale: product.price_sale,
+        product_id: product.id,
+        product_name: product.product_name,
+        quantity: product.quantity,
+        discount: 0,
+      })
+    },
+  )
   let data = {
     store_id: 4235,
-    full_name: 'Mạnh',
-    phone: '0351234567',
-    email: 'lyquyetvanle@gmail.com',
+    full_name: selectedCustomer.value.fullname,
+    phone: selectedCustomer.value.mobile,
+    email: selectedCustomer.value.email,
     note: null,
-    ship_partner_id: null,
-    utm_source: 'salekit.com',
-    ref_sub: 'salekit.com',
-    payment_method: 5,
-    pay_type: 2,
-    extra_price: 10000,
-    pay_fee: 20000,
-    discount: 44850,
-    ship_fee: 20000,
-    payment_id: 5,
-    coupon_id: 5989,
-    products:products,
+    utm_source: 'POS',
+    ref_sub: 'POS',
+    // payment_method: 5,
+    // pay_type: 2,
+    discount: discount.value,
+    // coupon_id: 5989,
+    products: products,
     create_by_order: 1,
-    sale_id: User.user_id,
+    sale_id: User_data.value.user_id,
     // "sale_name": "quyet",
     // "schedule_at": "",
-    user_id: 36225,
+    user_id: User_data.value.user_id,
   }
-  if(isOnline.value){
-
-    console.log('localItemSelect',localItemSelect.value,selectedCustomer.value)
-    console.log('online_same_ffline')
-    Helper.pushOrderLocal(data)
-  //   Posservice.createOrder(data).then((res) => {
-  //   console.log(res.data)
-  // })
-  }
-  else{
+  let shop_id = User_data.value.shop_id
+  if (isOnline.value) {
+    Helper.pushOrderLocal(data, shop_id)
+    selectedCustomer.value = null
+    emit('createOrderSusccess', true)
+    //   Posservice.createOrder(data).then((res) => {
+    //   console.log(res.data)
+    // })
+  } else {
     console.log('offline')
-    Helper.pushOrderLocal(data)
+    Helper.pushOrderLocal(data, shop_id)
+    selectedCustomer.value = null
+    emit('createOrderSusccess', true)
   }
-
 }
 const updateStatus = () => {
   isOnline.value = navigator.onLine
@@ -261,8 +299,7 @@ onMounted(() => {
   updateStatus()
 })
 // Nếu bạn muốn sử dụng ref để tạo ra một biến riêng
-const localItemSelect = ref(props.itemSelect)
-const discount = ref(0)
+
 // Tính toán tổng tiền hàng
 const totalAmount = computed(() => {
   return Helper.calculateTotalAmount(localItemSelect.value?.products || [])
@@ -276,13 +313,22 @@ watch(
   () => props.itemSelect,
   (newItem) => {
     localItemSelect.value = newItem
-  }
+  },
 )
 </script>
-<script   lang="ts">
+<script lang="ts">
 export default {
   name: 'InvoiceOrder',
 }
 </script>
 <style scoped>
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
 </style>

@@ -23,13 +23,16 @@ export class Helper {
     const discountedAmount = totalAmount - discount
     return this.formatCurrency(discountedAmount)
   }
-  static pushOrderLocal(order) {
-    let dataOrderLocal = localStorage.getItem('orderListOffline')
+  static pushOrderLocal(order, shop_id) {
+    let dataOrderLocal = localStorage.getItem('orderListOffline_' + shop_id)
     if (dataOrderLocal) {
-      dataOrderLocal.push(order)
-      localStorage.setItem('orderListOffline', dataOrderLocal)
+      let listorder = JSON.parse(dataOrderLocal)
+      listorder.push(order)
+      localStorage.setItem('orderListOffline_' + shop_id, JSON.stringify(listorder))
     } else {
-      localStorage.setItem('orderListOffline', order)
+      const list_order = []
+      list_order.push(order)
+      localStorage.setItem('orderListOffline_' + shop_id, JSON.stringify(list_order))
     }
   }
 }

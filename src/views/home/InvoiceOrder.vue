@@ -73,7 +73,7 @@
         <input
           v-model.number="discount"
           type="number"
-          class="rounded px-2 py-1 w-1/4 ml-2 text-right border-b-2 focus:outline-none"
+          class="rounded px-2 pr-0 py-1 w-1/4 ml-2 text-right border-b-2 focus:outline-none"
           placeholder="0"
         />
       </div>
@@ -85,9 +85,19 @@
       </div>
       <div class="flex justify-between items-center mb-4">
         <span class="font-semibold text-[16px]">Tiền khách đưa (F8)</span>
+        <span
+          class="border-b rounded px-2 pr-0 py-1 text-right w-1/3 focus:outline-none"
+          @click="showInputPayment = true"
+          v-show="showInputPayment == false"
+        >
+          {{ Helper.formatCurrency(PaymentCustomer) }}
+        </span>
         <input
-          type="text"
-          class="border-b-2 rounded px-2 py-1 text-right w-1/3 focus:outline-none"
+          v-model="PaymentCustomer"
+          v-show="showInputPayment == true"
+          @change="showInputPayment = false"
+          type="number"
+          class="border-b rounded px-2 pr-0 py-1 text-right w-1/3 focus:outline-none"
         />
       </div>
 
@@ -96,11 +106,23 @@
         <span class="font-semibold">Phương thức thanh toán</span>
         <div class="flex items-center mt-2">
           <label class="flex items-center">
-            <input type="radio" name="payment-method" value="cash" class="mr-2" />
+            <input
+              v-model="PaymentMethod"
+              type="radio"
+              name="payment-method"
+              value="6"
+              class="mr-2"
+            />
             Tiền mặt
           </label>
           <label class="flex items-center ml-4">
-            <input type="radio" name="payment-method" value="bank" class="mr-2" />
+            <input
+              v-model="PaymentMethod"
+              type="radio"
+              name="payment-method"
+              value="2"
+              class="mr-2"
+            />
             Chuyển khoản
           </label>
         </div>
@@ -109,7 +131,9 @@
       <!-- Change -->
       <div class="flex justify-between items-center mb-4">
         <span class="font-semibold">Tiền thừa trả khách</span>
-        <strong class="text-blue-600 text-lg"></strong>
+        <strong v-if="PaymentCustomer - totalPayNumber >= 0" class="text-600 text-lg">{{
+          Helper.formatCurrency(PaymentCustomer - totalPayNumber)
+        }}</strong>
       </div>
     </div>
 
@@ -117,7 +141,7 @@
       <!-- Auto-print -->
       <div class="mb-4 justify-end">
         <label class="flex items-center">
-          <input type="checkbox" class="mr-2" />
+          <input v-model="autoPrint" type="checkbox" class="mr-2" />
           In hóa đơn tự động
         </label>
       </div>
@@ -146,17 +170,28 @@ import IconAdd from '@/components/icons/IconAdd.vue'
 import IconSearch from '@/components/icons/IconSearch.vue'
 import IconDown2 from '@/components/icons/IconDown2.vue'
 import { ref, computed, watch, onMounted } from 'vue'
-import { UserInfo } from '@/stores/store'
-import { Helper } from '../helper.js'
+import { UserInfo, BrandSelect } from '@/stores/store'
+import { Helper } from '../../helper.js'
 import Posservice from '@/service/Posservice.js'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
 import AddCustomer from '@/components/customer/AddCustomer.vue'
+import { notify } from '@kyvg/vue3-notification'
 
 // const keywords = ref('')
 const emit = defineEmits(['createOrderSusccess'])
 let searchResults = ref([])
 let loading = ref(false)
+let PaymentMethod = ref(6)
+let autoPrint = ref(true)
+let PaymentCustomer = ref(0)
+let showInputPayment = ref(false)
 let openAddCustomer = ref(false)
+interface Brand {
+  id: number
+  shop_id: number
+  name: string
+  store_id: number
+}
 interface Customer {
   id: number
   fullname: string
@@ -165,8 +200,13 @@ interface Customer {
   address: string
   point: number
 }
+interface typePrice {
+  text: string
+  number: number
+}
 
 const selectedCustomer = ref<Customer>(null)
+const BrandSelected = ref<Brand>(null)
 const discount = ref(0)
 const storeUser = UserInfo()
 // Định nghĩa props
@@ -207,7 +247,7 @@ let User_data = ref<User>({
 const isOnline = ref(navigator.onLine)
 
 const searchCustomer = (input: { data: string }) => {
-  if (input.data.trim() === '') {
+  if (input.data && input.data.trim() === '') {
     searchResults.value = []
     return
   }
@@ -229,12 +269,21 @@ const searchCustomer = (input: { data: string }) => {
 
 const create_Order = () => {
   User_data.value = storeUser.get as User
+  BrandSelected.value = BrandSelect().get as Brand
   if (!selectedCustomer.value) {
-    alert('Vui lòng chọn khách hàng')
+    notify({
+      title: 'Lỗi',
+      text: 'Vui lòng chọn khách hàng',
+      group: 'error',
+    })
     return
   }
   if (!localItemSelect.value?.products?.length) {
-    alert('Vui lòng chọn sản phẩm')
+    notify({
+      title: 'Lỗi',
+      text: 'Vui lòng chọn sản phẩm',
+      type: 'error',
+    })
     return
   }
   let products: {
@@ -256,30 +305,44 @@ const create_Order = () => {
       })
     },
   )
+  let time = new Date().toISOString().replace('T', ' ').replace('Z', '').substring(0, 16)
+  let formattedTime = new Date().toLocaleDateString('en-GB').replace(/\//g, '-')
+  time = `${formattedTime} ${time.split(' ')[1]}`
+  console.log('timetimetimetime', time)
   let data = {
-    store_id: 4235,
+    id: Helper.getMaxId(User_data.value.shop_id),
+    time: time,
+    store_id: BrandSelected.value.store_id,
     full_name: selectedCustomer.value.fullname,
     phone: selectedCustomer.value.mobile,
     email: selectedCustomer.value.email,
     note: null,
     utm_source: 'POS',
     ref_sub: 'POS',
-    // payment_method: 5,
-    // pay_type: 2,
+    payment_method: PaymentMethod.value,
     discount: discount.value,
-    // coupon_id: 5989,
+    coupon_id: '',
     products: products,
     create_by_order: 1,
+    status: 0,
     sale_id: User_data.value.user_id,
-    // "sale_name": "quyet",
-    // "schedule_at": "",
     user_id: User_data.value.user_id,
   }
   let shop_id = User_data.value.shop_id
   if (isOnline.value) {
+    // delete data.id
+    //delete data.time
+    // delete data.status
+    // console.log(data)
     Helper.pushOrderLocal(data, shop_id)
     selectedCustomer.value = null
+    PaymentCustomer.value = 0
     emit('createOrderSusccess', true)
+    notify({
+      title: 'Thành công',
+      text: 'Đơn hàng đã được tạo thành công!',
+      type: 'success',
+    })
     //   Posservice.createOrder(data).then((res) => {
     //   console.log(res.data)
     // })
@@ -287,7 +350,13 @@ const create_Order = () => {
     console.log('offline')
     Helper.pushOrderLocal(data, shop_id)
     selectedCustomer.value = null
+    PaymentCustomer.value = 0
     emit('createOrderSusccess', true)
+    notify({
+      title: 'Thành công',
+      text: 'Đơn hàng đã được lưu offline!',
+      type: 'success',
+    })
   }
 }
 const updateStatus = () => {
@@ -305,9 +374,13 @@ const totalAmount = computed(() => {
   return Helper.calculateTotalAmount(localItemSelect.value?.products || [])
 })
 const totalPay = computed(() => {
-  return Helper.calculateTotalPay(localItemSelect.value?.products, discount.value)
+  const data = Helper.calculateTotalPay(localItemSelect.value?.products, discount.value)
+  return data
 })
-
+const totalPayNumber = computed(() => {
+  const data = Helper.calculateTotalPay(localItemSelect.value?.products, discount.value, 1)
+  return data
+})
 // Theo dõi sự thay đổi của props để cập nhật localItemSelect
 watch(
   () => props.itemSelect,

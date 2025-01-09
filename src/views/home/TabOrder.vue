@@ -11,10 +11,10 @@ import More from '@/components/icons/More.vue'
 import ProductList from './ProductList.vue'
 import TheWelcome from '@/components/TheWelcome.vue'
 import InvoiceOrder from './InvoiceOrder.vue'
-import { Helper } from '../helper.js'
+import { Helper } from '../../helper.js'
 import { ref, reactive, onMounted, watch, watchEffect, nextTick } from 'vue'
-import { TrademarkList, CategoryList, UserInfo } from '../stores/store.js'
-import Posservice from '../service/Posservice'
+import { TrademarkList, CategoryList, UserInfo } from '../../stores/store.js'
+import Posservice from '../../service/Posservice'
 import Select2 from '@/components/select2/Select2.vue'
 // import SelectMunti from '@/components/select2/SelectMunti.vue'
 
@@ -85,7 +85,7 @@ const products1 = ref<Product[]>([])
 const selectedProduct = ref<Product | null>(null)
 const searchResults = ref<Product[]>([])
 const Userinfo = ref<User>(null)
-if (localStorage.getItem('products')) {
+if (localStorage.getItem('products') && localStorage.getItem('products') !== 'undefined') {
   console.log('get products from local storage')
   products.value = JSON.parse(localStorage.getItem('products') || '')
 }
@@ -102,14 +102,10 @@ let quantityOffline = ref(0)
 watch(user, (val: any) => {
   loaduser.value = true
   Userinfo.value = UserInfo().get as User
-  quantityOffline = localStorage.getItem('orderListOffline_' + Userinfo?.value?.shop_id)
-    .length as any
-  console.log(
-    'quantityOffline',
-    quantityOffline,
-    Userinfo?.value?.shop_id,
-    localStorage.getItem('orderListOffline_' + Userinfo?.value?.shop_id).length,
-  )
+  const data_local_order = localStorage.getItem('orderListOffline_' + Userinfo?.value?.shop_id)
+  if (data_local_order) {
+    quantityOffline.value = JSON.parse(data_local_order).length
+  }
 })
 
 // Import các thành phần cần dùng
@@ -255,11 +251,15 @@ const deleteProduct = (index: number) => {
     class="h-[52px] w-full flex"
     style="background: linear-gradient(90deg, #1f83c9 0%, #a940bb 100%)"
   >
-    <div class="flex max-w-[25vw] w-full">
-      <img
-        src="https://salekit.com/assets/pos1/img/icon-salekit-06.2ad457de.png"
-        class="w-[39px] h-[39px] ml-[20px] mt-[6px]"
-      />
+    <div>
+      <RouterLink to="/">
+        <img
+          src="https://salekit.com/assets/pos1/img/icon-salekit-06.2ad457de.png"
+          class="w-[39px] h-[39px] ml-[20px] mt-[6px]"
+        />
+      </RouterLink>
+    </div>
+    <div v-if="$route.path === '/'" class="flex max-w-[25vw] w-full">
       <div
         class="autocomplete-container bg-white min-w-[22vw] ml-4 mt-2 flex items-center border px-2 py-1 mb-4 pt-0 rounded-full h-[40px] space-x-2"
       >
@@ -303,6 +303,7 @@ const deleteProduct = (index: number) => {
       </div>
     </div>
     <div
+      v-if="$route.path === '/'"
       class="flex gap-4 ml-[100px] pt-[15px] max-w-[30vw] flex-no-wrap overflow-x-auto overflow-y-hidden"
     >
       <div
@@ -326,13 +327,18 @@ const deleteProduct = (index: number) => {
         </div>
       </div>
     </div>
-    <IconAddTab @click="addTab()" class="hover:cursor-pointer mt-5 ml-4" />
+    <IconAddTab
+      v-if="$route.path === '/'"
+      @click="addTab()"
+      class="hover:cursor-pointer mt-5 ml-4"
+    />
     <InforUser :user="loaduser" :quantityOffline="quantityOffline"></InforUser>
   </div>
 
   <div class="flex bg-gray-200">
     <TheWelcome></TheWelcome>
     <div
+      v-if="$route.path === '/'"
       class="pl-[20px] mr-[16px] ml-[75px] max-w-[70vw] mt-[16px] rounded-[8px] bg-white min-w-[70vw] h-[calc(100vh - 84px)]"
       style="height: calc(100vh - 84px); max-height: calc(100vh - 84px)"
     >
@@ -445,6 +451,7 @@ const deleteProduct = (index: number) => {
       </div>
     </div>
     <InvoiceOrder
+      v-if="$route.path === '/'"
       :itemSelect="itemSelect"
       @createOrderSusccess="createOrderSusccess"
     ></InvoiceOrder>

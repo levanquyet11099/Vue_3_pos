@@ -4,6 +4,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createVuetify } from 'vuetify'
 import 'vuetify/styles' // Import Vuetify styles
+import Notifications from '@kyvg/vue3-notification'
 
 import App from './App.vue'
 import router from './router'
@@ -12,9 +13,16 @@ const vuetify = createVuetify({
 })
 
 const app = createApp(App)
-
 app.use(createPinia())
 app.use(router)
 app.use(vuetify)
 
+app.use(Notifications, {
+  // Cấu hình mặc định cho notify
+  position: 'top right',
+  duration: 5000,
+  speed: 300,
+  type: 'success',
+  group: 'default',
+})
 app.mount('#app')

@@ -29,5 +29,6 @@ Posservice.userInfo(token).then((res) => {
 <template>
   <div class="fiex bg-gray-200 h-[100vh] h-screen" style="position: relative">
     <TabOrder :user="user"></TabOrder>
+    <router-view></router-view>
   </div>
 </template>

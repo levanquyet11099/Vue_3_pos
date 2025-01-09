@@ -13,86 +13,98 @@ export const useCounterStore = defineStore('counter', () => {
 
 export const ProductList = defineStore('ProductList', {
   state: () => ({
-      Product: [],
-      total: 0,
+    Product: [],
+    total: 0,
   }),
   actions: {
-      set(product_list, total) {
-          this.Product = product_list;
-          this.total = total;
-      },
+    set(product_list, total) {
+      this.Product = product_list
+      this.total = total
+    },
   },
   getters: {
-      getProduct: (state) => state.Product,
-      getTotal: (state) => state.total
-  }
-});
+    getProduct: (state) => state.Product,
+    getTotal: (state) => state.total,
+  },
+})
 export const InvoiceOrder = defineStore('InvoiceOrder', {
   state: () => ({
-      Invoice: [],
-      total: 0,
+    Invoice: [],
+    total: 0,
   }),
   actions: {
-      set(invoice_list, total) {
-          this.Invoice = invoice_list;
-          this.total = total;
-      },
+    set(invoice_list, total) {
+      this.Invoice = invoice_list
+      this.total = total
+    },
   },
   getters: {
-      getInvoice: (state) => state.Invoice,
-      getTotal: (state) => state.total
-  }
-});
+    getInvoice: (state) => state.Invoice,
+    getTotal: (state) => state.total,
+  },
+})
 export const CategoryList = defineStore('CategoryList', {
   state: () => ({
-      Category: []
+    Category: [],
   }),
   actions: {
-      set(category_list) {
-          this.Category = category_list
-      },
+    set(category_list) {
+      this.Category = category_list
+    },
   },
   getters: {
-      get: (state) => state.Category
-  }
-});
+    get: (state) => state.Category,
+  },
+})
 export const TrademarkList = defineStore('TrademarkList', {
   state: () => ({
-      Trademark: []
+    Trademark: [],
   }),
   actions: {
-      set(trademark_list) {
-          this.Trademark = trademark_list
-      },
+    set(trademark_list) {
+      this.Trademark = trademark_list
+    },
   },
   getters: {
-      get: (state) => state.Trademark
-  }
-});
+    get: (state) => state.Trademark,
+  },
+})
 export const BrandList = defineStore('BrandList', {
   state: () => ({
-      Brand: []
+    Brand: [],
   }),
   actions: {
-      set(brand_list) {
-          this.Brand = brand_list
-      },
+    set(brand_list) {
+      this.Brand = brand_list
+    },
   },
   getters: {
-      get: (state) => state.Brand
-  }
-});
-export const UserInfo = defineStore('UserInfo', {
-    state: () => ({
-        User: {}
-    }),
-    actions: {
-        set(data) {
-            this.User = data
-        },
+    get: (state) => state.Brand,
+  },
+})
+export const BrandSelect = defineStore('BrandSelect', {
+  state: () => ({
+    Brand: {},
+  }),
+  actions: {
+    set(brand) {
+      this.Brand = brand
     },
-    getters: {
-        get: (state) => state.User
-    }
-  });
-
+  },
+  getters: {
+    get: (state) => state.Brand,
+  },
+})
+export const UserInfo = defineStore('UserInfo', {
+  state: () => ({
+    User: {},
+  }),
+  actions: {
+    set(data) {
+      this.User = data
+    },
+  },
+  getters: {
+    get: (state) => state.User,
+  },
+})

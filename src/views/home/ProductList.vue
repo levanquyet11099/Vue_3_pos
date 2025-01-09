@@ -2,8 +2,8 @@
 import { ref, computed, onMounted } from 'vue'
 import IconDown from '@/components/icons/IconDown.vue'
 import { Helper } from '@/helper'
-import Posservice from '../service/Posservice'
-import { TrademarkList, CategoryList } from '../stores/store.js'
+import Posservice from '../../service/Posservice'
+import { TrademarkList, CategoryList } from '../../stores/store.js'
 
 interface Trademark {
   id: number
@@ -83,7 +83,7 @@ const products = ref<
     supplier: string
   }>
 >([])
-if (localStorage.getItem('products')) {
+if (localStorage.getItem('products') && localStorage.getItem('products') !== 'undefined') {
   console.log('get products from local storage')
   products.value = JSON.parse(localStorage.getItem('products') || '')
 }
@@ -218,4 +218,3 @@ export default {
     </div>
   </div>
 </template>
-

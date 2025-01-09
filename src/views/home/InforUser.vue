@@ -2,7 +2,7 @@
 import IconExclamationMark from '@/components/icons/IconExclamationMark.vue'
 import IconOff from '@/components/icons/IconOff.vue'
 import IconDown from '@/components/icons/IconDown.vue'
-import { BrandList, UserInfo } from '@/stores/store'
+import { BrandList, UserInfo, BrandSelect } from '@/stores/store'
 import { ref, onMounted, watch } from 'vue'
 import StatusNetwork from '@/components/wifi/StatusNetwork.vue'
 interface User_data {
@@ -54,22 +54,34 @@ let dynamicNumber = props.quantityOffline
 
 watch(
   () => props.quantityOffline,
-  (val) => {
+  (val: number) => {
     if (val) {
       dynamicNumber = val
     }
   },
-
-  // () => quantityOffline.quantityOffline,
-  // (val) => {
-  //   dynamicNumber = val
-  // },
 )
+
+watch(
+  () => selectedBrand.value,
+  (val: typeof selectedBrand.value) => {
+    if (val) {
+      selectedBrand.value = val
+      BrandSelect().set(val)
+    }
+  },
+)
+
+// () => quantityOffline.quantityOffline,
+// (val) => {
+//   dynamicNumber = val
+// },
+
 onMounted(() => {
   User.value = UserInfo().get as User_data
   Brand = BrandList().get
   if (Brand.length > 0) {
     selectedBrand.value = Brand[0]
+    BrandSelect().set(Brand[0])
   }
 })
 </script>
@@ -103,9 +115,13 @@ export default {
         </button>
 
         <div class="flex items-center pr-0">
-          <div class="bg-[#733D96] rounded-full h-[39px] w-[39px] flex items-center justify-center">
-            <StatusNetwork :quantityOrder="quantityOffline"></StatusNetwork>
-          </div>
+          <router-link to="/listorder">
+            <div
+              class="bg-[#733D96] rounded-full h-[39px] w-[39px] flex items-center justify-center"
+            >
+              <StatusNetwork :quantityOrder="quantityOffline"></StatusNetwork>
+            </div>
+          </router-link>
           <IconExclamationMark class="pl-2 h-[30px] w-[30px]"></IconExclamationMark>
         </div>
         <span class="text-white">{{ User.data }}</span>

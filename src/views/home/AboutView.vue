@@ -1,5 +1,5 @@
 <template>
-  <div class="flex">
+  <div class="flex ml-[75px]">
     <!-- Left Column -->
     <div class="w-2/3 p-4">
       <table class="w-full border-collapse border border-gray-200">
@@ -63,5 +63,4 @@
   </div>
 </template>
 
-<style>
-</style>
+<style></style>

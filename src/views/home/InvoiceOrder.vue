@@ -292,16 +292,30 @@ const create_Order = () => {
     product_name: string
     quantity: number
     discount: number
+    thumb_url?: string
+    sku?: string
+    attribute: string
   }[] = []
   // console.log('localItemSelect', localItemSelect.value)
   localItemSelect.value.products.forEach(
-    (product: { price_sale: number; id: number; product_name: string; quantity: number }) => {
+    (product: {
+      price_sale: number
+      id: number
+      product_name: string
+      quantity: number
+      thumb_url: string
+      sku: string
+      attribute: string
+    }) => {
       products.push({
         price_sale: product.price_sale,
         product_id: product.id,
         product_name: product.product_name,
         quantity: product.quantity,
         discount: 0,
+        thumb_url: product.thumb_url,
+        sku: product.sku,
+        attribute: product.attribute,
       })
     },
   )
@@ -333,7 +347,7 @@ const create_Order = () => {
     // delete data.id
     //delete data.time
     // delete data.status
-    // console.log(data)
+    console.log(data)
     Helper.pushOrderLocal(data, shop_id)
     selectedCustomer.value = null
     PaymentCustomer.value = 0

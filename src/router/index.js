@@ -13,6 +13,7 @@ const router = createRouter({
           path: 'listorder',
           name: 'listorder',
           component: () => import('../views/home/ListOrder.vue'),
+          props: true,
         },
         {
           path: '/shift',

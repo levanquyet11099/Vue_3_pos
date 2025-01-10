@@ -24,11 +24,14 @@ Posservice.userInfo(token).then((res) => {
       })
   }
 })
+const userChange = () => {
+  user.value = !user.value
+}
 </script>
 
 <template>
   <div class="fiex bg-gray-200 h-[100vh] h-screen" style="position: relative">
     <TabOrder :user="user"></TabOrder>
-    <router-view></router-view>
+    <router-view :user="user" @userChange="userChange"></router-view>
   </div>
 </template>

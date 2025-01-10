@@ -1,3 +1,4 @@
+import { ListOrder } from './stores/store'
 export class Helper {
   static formatCurrency(value) {
     return new Intl.NumberFormat('vi-VN', {
@@ -31,14 +32,16 @@ export class Helper {
       let listorder = JSON.parse(dataOrderLocal)
       listorder.push(order)
       localStorage.setItem('orderListOffline_' + shop_id, JSON.stringify(listorder))
+      ListOrder().set(listorder)
     } else {
       const list_order = []
       list_order.push(order)
       localStorage.setItem('orderListOffline_' + shop_id, JSON.stringify(list_order))
+      ListOrder().set(list_order)
     }
   }
   static getStringvalue(value) {
-    return value ? value : ''
+    return value ? `${value}` : ''
   }
   static getMaxId(shop_id) {
     let dataOrder = localStorage.getItem('orderListOffline_' + shop_id)

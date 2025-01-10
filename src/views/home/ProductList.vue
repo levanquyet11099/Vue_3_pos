@@ -51,6 +51,7 @@ const products = ref<
       category_id: number
       category_name: string
     }>
+    attribute: string
     price_sale: number
     unit_price: number
     description: string
@@ -210,7 +211,7 @@ export default {
             class="text-[12px] text-[#428BCA] whitespace-nowrap truncate max-w-[180px]"
             :title="product.name"
           >
-            {{ product.name }}
+            {{ product.attribute }}
           </p>
           <p class="font-[600]">{{ Helper.formatCurrency(product.price_sale) }}</p>
         </div>

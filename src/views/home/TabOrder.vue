@@ -39,6 +39,7 @@ interface Product {
     category_id: number
     category_name: string
   }>
+  attribute: string
   price_sale: number
   unit_price: number
   description: string
@@ -374,9 +375,11 @@ const deleteProduct = (index: number) => {
                 :src="p.thumb_url || 'https://static.salekit.com//public/images/no-image.png'"
                 class="w-[56px] h-[56px] min-w-[56px] min-h-[56px]"
               />
-              <p class="text-[14px] text-left font-bold text-[#7a7a7a] w-2/5 py-3">
+              <div class="text-[14px] text-left font-[500] text-[#7a7a7a] w-2/5">
                 {{ p.product_name }}
-              </p>
+                <div class="text-blue-400 font-400">{{ p.attribute }}</div>
+                <div>{{ p.sku }}</div>
+              </div>
               <div class="w-2/5 text-[14px] text-center">
                 <p class="text-[#428BCA]" :class="{ 'py-3': !p.price }">
                   {{ Helper.formatCurrency(p.price_sale) }}

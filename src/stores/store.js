@@ -108,3 +108,16 @@ export const UserInfo = defineStore('UserInfo', {
     get: (state) => state.User,
   },
 })
+export const ListOrder = defineStore('ListOrder', {
+  state: () => ({
+    List: [],
+  }),
+  actions: {
+    set(list) {
+      this.List = list
+    },
+  },
+  getters: {
+    get: (state) => state.List,
+  },
+})

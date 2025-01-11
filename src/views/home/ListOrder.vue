@@ -29,6 +29,8 @@ interface Order {
   store_id: number
   user_id: number
   utm_source: string
+  point: number
+  rate_point: number
   payment_method: number
 }
 interface typePrice {
@@ -154,7 +156,13 @@ const orderListFilter = computed(() => {
             <td class="px-4 py-4 text-primary">{{ order.id }}</td>
             <td class="px-4 py-4 text-center">{{ order.full_name }}</td>
             <td class="px-4 py-4 text-center">
-              {{ Helper.calculateTotalPay(order.products, order.discount) }}
+              {{
+                Helper.calculateTotalPay(
+                  order.products,
+                  order.discount,
+                  Helper.calculatePoint(order.point, order.rate_point),
+                )
+              }}
             </td>
             <td class="px-4 py-4 text-center">{{ order.time }}</td>
             <td class="px-4 py-4 text-center">

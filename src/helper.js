@@ -15,16 +15,21 @@ export class Helper {
       products.reduce((total, product) => total + product.price_sale * product.quantity, 0),
     )
   }
-  static calculateTotalPay(products, discount, type = 0) {
+  static calculateTotalPay(products, discount, point = 0, type = 0) {
     if (!products) return this.formatCurrency(0)
     const totalAmount = products.reduce(
       (total, product) => total + product.price_sale * product.quantity,
       0,
     )
-    const discountedAmount = totalAmount - discount
+    const discountedAmount = totalAmount - discount - point
     if (type == 1) {
-      return totalAmount
+      return discountedAmount
     } else return this.formatCurrency(discountedAmount)
+  }
+  static calculatePoint(point, rate) {
+    if (!point) return 0
+    if (!rate) return point
+    return point * rate
   }
   static pushOrderLocal(order, shop_id) {
     let dataOrderLocal = localStorage.getItem('orderListOffline_' + shop_id)

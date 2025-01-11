@@ -51,18 +51,25 @@ class PosService {
       },
     })
   }
-  createOrder(data) {
-    return axios.post(config.API_SALEKIT + 'order/create', data, {
+  createOrder(data, id) {
+    return axios.post(config.API_SALEKIT + 'order/create?Affiliate-Id=' + id, data, {
       headers: {
         'Content-type': 'application/json',
         'shop-id': 104,
-        'Affiliate-Id': 13540280,
       },
     })
   }
   userInfo(token) {
     // return axios.get(config.API_SALEKIT + 'user/info', {
     return axios.get('https://salekit.com/apiv1/user/info', {
+      headers: {
+        'Content-type': 'application/json',
+        token: token,
+      },
+    })
+  }
+  checkCoupon(coupon) {
+    return axios.get(config.API_SALEKIT + 'coupon/check?code=' + coupon, {
       headers: {
         'Content-type': 'application/json',
         token: token,

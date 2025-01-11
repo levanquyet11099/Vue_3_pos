@@ -44,6 +44,43 @@
           <IconAdd class="mr-2"></IconAdd>
         </button>
       </div>
+      <!-- User_data.point_shop.point_status == 1 && -->
+      <div v-if="selectedCustomer && selectedCustomer.point > 0">
+        <div class="flex items-center mb-4 bg-gray-100 p-2 rounded-[8px] w-1/2">
+          <span class="font-500 ml-1">Điểm Thưởng:</span>
+          <span class="ml-2 text-green">{{ selectedCustomer.point }} điểm </span>
+        </div>
+        <div class="flex items-center justify-between mb-4 w-full space-x-2">
+          <div class="flex items-center">
+            <input id="toggle" v-model="usePoint" type="checkbox" class="hidden" />
+            <label for="toggle" class="flex items-center cursor-pointer">
+              <div class="relative">
+                <div
+                  class="block w-[30px] h-[16px] rounded-full"
+                  :class="[usePoint == true ? 'bg-blue-300' : 'bg-white border border-gray-300']"
+                ></div>
+                <div
+                  class="dot absolute w-[13px] h-[12px] rounded-full transition transform duration-300 ease-in-out pt-[0px] pl-[1px] py-auto -mt-[14px] ml-[2px]"
+                  :class="[
+                    usePoint == true ? 'translate-x-[14px] bg-white' : 'translate-x-0 bg-gray-300',
+                  ]"
+                ></div>
+              </div>
+            </label>
+            <div class="ml-2">Dùng điểm thưởng</div>
+          </div>
+          <div v-if="usePoint && usePoint == true" class="flex justify-end">
+            <input
+              v-model.number="pointOrder"
+              v-bind:max="selectedCustomer.point"
+              @change="pointOrder = Math.min(Math.max(pointOrder, 0), selectedCustomer.point)"
+              type="number"
+              class="rounded px-2 pr-0 w-1/2 ml-2 text-right border-b focus:outline-none"
+              placeholder="0"
+            />
+          </div>
+        </div>
+      </div>
       <!-- </div> -->
 
       <!-- Total Products -->
@@ -56,14 +93,28 @@
       </p>
 
       <!-- Coupon -->
-      <div class="mb-4">
-        <button class="text-blue-500 flex items-center">
-          Coupon
-          <IconDown2 class="ml-2"></IconDown2>
-        </button>
-        <div class="mt-2 border p-2 rounded-lg hidden" id="couponBox">
-          <input type="text" class="border rounded px-2 py-1 w-3/4" placeholder="Nhập mã coupon" />
-          <button class="bg-blue-500 text-white px-4 py-1 rounded ml-2">Áp dụng</button>
+      <div class="mb-4 flex justify-between items-center pr-0">
+        <div>
+          <button class="text-blue-500 flex items-center py-1" @click="toggleCouponBox">
+            Coupon
+            <IconDown2 class="ml-2"></IconDown2>
+          </button>
+        </div>
+        <div
+          v-if="localItemSelect?.products?.length > 0"
+          class="p-2 pr-0 rounded-lg focus:outline-none"
+          :class="{ hidden: !showCouponBox }"
+          id="couponBox"
+        >
+          <input
+            v-model="coupon_id"
+            type="text"
+            class="border rounded px-2 py-1 focus:outline-none"
+            placeholder="Nhập mã coupon"
+          />
+          <button class="bg-blue-500 text-white px-4 py-1 rounded ml-2" @click="checkCoupon">
+            Áp dụng
+          </button>
         </div>
       </div>
 
@@ -72,10 +123,26 @@
         <span class="">Chiết khấu</span>
         <input
           v-model.number="discount"
+          v-show="showInputDiscount == true"
+          @change="showInputDiscount = false"
           type="number"
-          class="rounded px-2 pr-0 py-1 w-1/4 ml-2 text-right border-b-2 focus:outline-none"
+          class="rounded px-2 pr-0 py-1 w-1/4 ml-2 text-right border-b focus:outline-none"
           placeholder="0"
         />
+        <span
+          class="rounded px-2 pr-0 py-1 w-1/4 ml-2 text-right"
+          v-show="showInputDiscount == false"
+          @click="showInputDiscount = true"
+        >
+          {{ Helper.formatCurrency(discount) }}
+        </span>
+      </div>
+
+      <div v-if="usePoint" class="flex justify-between items-center mb-4">
+        <span class="">Đã dùng điểm thưởng</span>
+        <span class="rounded px-2 pr-0 py-1 w-1/4 ml-2 text-right" placeholder="0">
+          {{ Helper.formatCurrency(totalPointPay) }}</span
+        >
       </div>
 
       <!-- Payment Details -->
@@ -183,9 +250,19 @@ let searchResults = ref([])
 let loading = ref(false)
 let PaymentMethod = ref(6)
 let autoPrint = ref(true)
+let coupon_id = ref('')
 let PaymentCustomer = ref(0)
+let showInputDiscount = ref(false)
 let showInputPayment = ref(false)
 let openAddCustomer = ref(false)
+let usePoint = ref(false)
+let pointOrder = ref(0)
+let edit_discount = ref(false)
+let showCouponBox = ref(false)
+
+const toggleCouponBox = () => {
+  showCouponBox.value = !showCouponBox.value
+}
 interface Brand {
   id: number
   shop_id: number
@@ -204,7 +281,71 @@ interface typePrice {
   text: string
   number: number
 }
-
+interface Order {
+  id: string
+  customer: string
+  value: string
+  time: string
+  status: number
+  create_by_order: number
+  discount: number
+  email: string
+  full_name: string
+  note: string | null
+  phone: string
+  products: Array<any>
+  ref_sub: string
+  sale_id: number
+  store_id: number
+  user_id: number
+  utm_source: string
+  point: number
+  rate_point: number
+  payment_method: number
+}
+interface Product {
+  id: number
+  product_name: string
+  name: string
+  sku: string
+  category: Array<{
+    category_id: number
+    category_name: string
+  }>
+  attribute: string
+  price_sale: number
+  unit_price: number
+  description: string
+  slug: string
+  seo_title: string | null
+  seo_description: string
+  unit_name: string | null
+  content: string
+  photos: Array<{
+    photo: string
+    thumb: string
+  }>
+  type: number
+  licence_api_key: string | null
+  licence_api_url: string | null
+  price: number | null
+  image_json: string
+  thumb_url: string
+  external_link: string | null
+  package_height: string
+  weight: string
+  package_length: string
+  package_width: string
+  unit: Array<number>
+  store_id: number | null
+  parent_id: number
+  trademark: number
+  inventory: number | null
+  enable_order: number
+  supplier: string
+  quantity?: number
+  total?: number
+}
 const selectedCustomer = ref<Customer>(null)
 const BrandSelected = ref<Brand>(null)
 const discount = ref(0)
@@ -217,7 +358,6 @@ const props = defineProps({
   },
 })
 const localItemSelect = ref(props.itemSelect)
-
 interface User {
   status: number
   shop_id: string
@@ -230,7 +370,6 @@ interface User {
   }
   data: string
 }
-
 let User_data = ref<User>({
   status: 0,
   shop_id: '',
@@ -245,7 +384,34 @@ let User_data = ref<User>({
 })
 // let User = UserInfo().get
 const isOnline = ref(navigator.onLine)
-
+const checkCoupon = () => {
+  if (coupon_id.value.trim() === '') {
+    notify({
+      title: 'Lỗi',
+      text: 'Vui lòng nhập mã coupon',
+      group: 'error',
+    })
+    return
+  }
+  // Gọi API kiểm tra mã coupon
+  Posservice.checkCoupon(coupon_id.value).then((res) => {
+    if (res.data.data) {
+      discount.value = res.data.data.discount
+      notify({
+        title: 'Thành công',
+        text: 'Áp dụng mã coupon thành công',
+        type: 'success',
+      })
+    } else {
+      notify({
+        title: 'Lỗi',
+        text: 'Mã coupon không hợp lệ',
+        group: 'error',
+      })
+    }
+  })
+  toggleCouponBox()
+}
 const searchCustomer = (input: { data: string }) => {
   if (input.data && input.data.trim() === '') {
     searchResults.value = []
@@ -266,7 +432,6 @@ const searchCustomer = (input: { data: string }) => {
     loading.value = false
   })
 }
-
 const create_Order = () => {
   User_data.value = storeUser.get as User
   BrandSelected.value = BrandSelect().get as Brand
@@ -293,7 +458,7 @@ const create_Order = () => {
     quantity: number
     discount: number
     thumb_url?: string
-    sku?: string
+    product_sku?: string
     attribute: string
   }[] = []
   // console.log('localItemSelect', localItemSelect.value)
@@ -314,7 +479,7 @@ const create_Order = () => {
         quantity: product.quantity,
         discount: 0,
         thumb_url: product.thumb_url,
-        sku: product.sku,
+        product_sku: product.sku,
         attribute: product.attribute,
       })
     },
@@ -334,32 +499,41 @@ const create_Order = () => {
     utm_source: 'POS',
     ref_sub: 'POS',
     payment_method: PaymentMethod.value,
+    pay_type: PaymentMethod.value,
     discount: discount.value,
     coupon_id: '',
     products: products,
     create_by_order: 1,
     status: 0,
+    point: 0,
+    rate_point: 0,
+    pay_status: 1,
+    pay_money: totalPayNumber.value,
     sale_id: User_data.value.user_id,
     user_id: User_data.value.user_id,
   }
+  if (usePoint.value) {
+    data.point = pointOrder.value
+    data.rate_point = User_data.value.point_shop.point_rate
+  }
   let shop_id = User_data.value.shop_id
   if (isOnline.value) {
-    // delete data.id
-    //delete data.time
+    console.log('online')
+    delete data.id
+    delete data.time
     // delete data.status
-    console.log(data)
-    Helper.pushOrderLocal(data, shop_id)
-    selectedCustomer.value = null
+    // Helper.pushOrderLocal(data, shop_id)
+    Posservice.createOrder(data, selectedCustomer.value.id).then((res) => {
+      console.log(res.data)
+    })
     PaymentCustomer.value = 0
+    selectedCustomer.value = null
     emit('createOrderSusccess', true)
     notify({
       title: 'Thành công',
       text: 'Đơn hàng đã được tạo thành công!',
       type: 'success',
     })
-    //   Posservice.createOrder(data).then((res) => {
-    //   console.log(res.data)
-    // })
   } else {
     console.log('offline')
     Helper.pushOrderLocal(data, shop_id)
@@ -388,13 +562,26 @@ const totalAmount = computed(() => {
   return Helper.calculateTotalAmount(localItemSelect.value?.products || [])
 })
 const totalPay = computed(() => {
-  const data = Helper.calculateTotalPay(localItemSelect.value?.products, discount.value)
+  const data = Helper.calculateTotalPay(
+    localItemSelect.value?.products,
+    discount.value,
+    totalPointPay.value as number,
+  )
   return data
 })
-const totalPayNumber = computed(() => {
-  const data = Helper.calculateTotalPay(localItemSelect.value?.products, discount.value, 1)
-  return data
+const totalPointPay = computed<number>(() => {
+  return Helper.calculatePoint(pointOrder.value, User_data.value.point_shop.point_rate)
 })
+const totalPayNumber = computed<number>(() => {
+  const result = Helper.calculateTotalPay(
+    localItemSelect.value?.products,
+    discount.value,
+    totalPointPay.value,
+    1,
+  )
+  return typeof result === 'number' ? result : 0
+})
+
 // Theo dõi sự thay đổi của props để cập nhật localItemSelect
 watch(
   () => props.itemSelect,
@@ -414,8 +601,10 @@ input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
 input[type='number'] {
   -moz-appearance: textfield;
 }
+/* input:checked + label .dot {
+  transform: translateX(100%);
+} */
 </style>

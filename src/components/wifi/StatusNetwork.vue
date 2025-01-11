@@ -1,14 +1,14 @@
 <template>
   <div class="wifi-status">
-    <!-- <IconWifi v-if="isOnline"></IconWifi> -->
-    <IconOffWifi v-if="isOnline" class="offline-icon" :quantity="dynamicNumber"> </IconOffWifi>
-    <IconOffWifi v-else class="offline-icon"> </IconOffWifi>
+    <IconWifi v-if="isOnline"></IconWifi>
+    <IconOffWifi v-else class="offline-icon" :quantity="dynamicNumber"> </IconOffWifi>
+    <!-- <IconOffWifi v-else class="offline-icon"> </IconOffWifi> -->
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
-// import IconWifi from '../icons/IconWifi.vue'
+import IconWifi from '../icons/IconWifi.vue'
 import IconOffWifi from '../icons/IconOffWifi.vue'
 
 // const components = {

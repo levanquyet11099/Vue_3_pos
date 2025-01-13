@@ -5,18 +5,18 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: '/pos/subindex',
       name: 'home',
       component: HomeView,
       children: [
         {
-          path: 'listorder',
-          name: 'listorder',
+          path: 'pos/listorder',
+          name: 'pos/listorder',
           component: () => import('../views/home/ListOrder.vue'),
           props: true,
         },
         {
-          path: '/shift',
+          path: 'pos/shift',
           name: 'shift',
           component: () => import('../views/home/AboutView.vue'),
         },
@@ -24,7 +24,7 @@ const router = createRouter({
     },
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/',
+      redirect: '/pos/subindex',
     },
   ],
 })

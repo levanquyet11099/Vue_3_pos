@@ -487,7 +487,6 @@ const create_Order = () => {
   let time = new Date().toISOString().replace('T', ' ').replace('Z', '').substring(0, 16)
   let formattedTime = new Date().toLocaleDateString('en-GB').replace(/\//g, '-')
   time = `${formattedTime} ${time.split(' ')[1]}`
-  console.log('timetimetimetime', time)
   let data = {
     id: Helper.getMaxId(User_data.value.shop_id),
     time: time,
@@ -523,11 +522,18 @@ const create_Order = () => {
     delete data.time
     // delete data.status
     // Helper.pushOrderLocal(data, shop_id)
-    Posservice.createOrder(data, selectedCustomer.value.id).then((res) => {
-      console.log(res.data)
+    Posservice.createOrder(data, selectedCustomer.value.id).then(async (res) => {
+      if (autoPrint.value) {
+        const printUrl = `https://salekit.com/order/printOrderList?order_id=${res.data.order_id}&store_id=&type=invoice&pos=1`
+        const printWindow = window.open(printUrl, '_blank', 'width=1024,height=800')
+        printWindow.onload = () => {
+          printWindow.print()
+        }
+      }
     })
     PaymentCustomer.value = 0
     selectedCustomer.value = null
+
     emit('createOrderSusccess', true)
     notify({
       title: 'Thành công',

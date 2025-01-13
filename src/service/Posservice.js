@@ -76,5 +76,13 @@ class PosService {
       },
     })
   }
+  printOrder(data) {
+    return axios.post(config.API_SALEKIT + 'order/print', data, {
+      headers: {
+        'Content-type': 'application/json',
+        token: token,
+      },
+    })
+  }
 }
 export default new PosService()

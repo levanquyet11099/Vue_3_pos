@@ -18,19 +18,14 @@ const router = createRouter({
         {
           path: '/shift',
           name: 'shift',
-          // route level code-splitting
-          // this generates a separate chunk (About.[hash].js) for this route
-          // which is lazy-loaded when the route is visited.
           component: () => import('../views/home/AboutView.vue'),
         },
       ],
     },
-
-    // {
-    //   path: '/listorder',
-    //   name: 'listorder',
-    //   component: () => import('../views/home/ListOrder.vue'),
-    // },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/',
+    },
   ],
 })
 

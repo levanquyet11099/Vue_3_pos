@@ -108,7 +108,7 @@ const orderListFilter = computed(() => {
 const syncOrder = () => {
   console.log('syncOrder')
   if (orderListFilter.value.length > 0) {
-    orderListFilter.value.forEach((order: Order) => {
+    orderListFilter.value.forEach((order: Order, index) => {
       // if (order.status == 0) {
       //   console.log('order thanh cong')
       // }
@@ -130,7 +130,12 @@ const syncOrder = () => {
         // console.log('order.value')
         delete order.value
       }
-      Posservice.createOrder(order, customer_id)
+      Posservice.createOrder(order, customer_id).then((res) => {
+        if (res.data.status == 1) {
+          order.status = 1
+          orderListFilter.value.splice(index, 1)
+        }
+      })
     })
     // localStorage.setItem('orderListOffline_' + user.value.shop_id, JSON.stringify(orderListFilter.value))
     // emit('userChange')

@@ -10,10 +10,16 @@ export class Helper {
       .replace('VND', '')
       .trim()
   }
-  static calculateTotalAmount(products) {
-    return this.formatCurrency(
-      products.reduce((total, product) => total + product.price_sale * product.quantity, 0),
+  static calculateTotalAmount(products, type = 0) {
+    const total = products.reduce(
+      (total, product) => total + product.price_sale * product.quantity,
+      0,
     )
+    if (type == 1) {
+      return total
+    } else {
+      return this.formatCurrency(total)
+    }
   }
   static calculateTotalPay(products, discount, point = 0, type = 0) {
     if (!products) return this.formatCurrency(0)

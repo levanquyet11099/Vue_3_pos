@@ -396,7 +396,35 @@ const checkCoupon = () => {
   Posservice.checkCoupon(coupon_id.value).then((res) => {
     if (res.data.data) {
       toast.success('Áp dụng mã coupon thành công', { timeout: 2000 })
-      discount.value = res.data.data.discount
+      if (res.data.data.discount_type == 1) {
+        if (res.data.data.products) {
+          let applyProducts = localItemSelect.value?.products.filter((product: Product) =>
+            res.data.data.products.includes(Helper.getStringvalue(product.id)),
+          )
+          discount.value =
+            (res.data.data.discount * Helper.calculateTotalAmount(applyProducts, 1)) / 100
+        } else {
+          discount.value =
+            (res.data.data.discount *
+              Helper.calculateTotalAmount(localItemSelect.value?.products, 1)) /
+            100
+        }
+      } else {
+        if (res.data.data.products) {
+          let applyProducts = localItemSelect.value?.products.filter((product: Product) =>
+            res.data.data.products.includes(Helper.getStringvalue(product.id)),
+          )
+          discount.value = applyProducts.reduce(
+            (total, product) => total + res.data.data.discount * product.quantity,
+            0,
+          )
+        } else {
+          discount.value = localItemSelect.value?.products.reduce(
+            (total, product) => total + res.data.data.discount * product.quantity,
+            0,
+          )
+        }
+      }
     } else {
       toast.error('Mã coupon không hợp lệ', { timeout: 2000 })
     }

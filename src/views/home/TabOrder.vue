@@ -92,12 +92,14 @@ if (localStorage.getItem('products') && localStorage.getItem('products') !== 'un
   console.log('get products from local storage')
   products.value = JSON.parse(localStorage.getItem('products') || '')
 }
-// Lấy danh sách sản phẩm từ API
-Posservice.getProducts().then((res) => {
-  console.log('get products from api')
-  products.value = res.data.data
-  localStorage.setItem('products', JSON.stringify(res.data.data))
-})
+if (ref(navigator.onLine) && ref(navigator.onLine).value) {
+  // Lấy danh sách sản phẩm từ API
+  Posservice.getProducts().then((res) => {
+    console.log('get products from api')
+    products.value = res.data.data
+    localStorage.setItem('products', JSON.stringify(res.data.data))
+  })
+}
 
 let loaduser = ref(false)
 let user = defineProps(['user'])
@@ -105,6 +107,9 @@ let quantityOffline = ref(0)
 watch(user, (val: any) => {
   loaduser.value = true
   Userinfo.value = UserInfo().get as User
+  Userinfo.value = localStorage.getItem('UserInfo')
+    ? (JSON.parse(localStorage.getItem('UserInfo')) as User)
+    : (Userinfo.value as User)
   const data_local_order = localStorage.getItem('orderListOffline_' + Userinfo?.value?.shop_id)
   if (data_local_order) {
     quantityOffline.value = JSON.parse(data_local_order).length
@@ -127,14 +132,19 @@ const components = {
   Select2,
   // SelectMunti,
 }
-Posservice.trademark().then((res) => {
-  const trademarks = TrademarkList()
-  trademarks.set(res.data.data)
-})
-Posservice.category().then((res) => {
-  const categories = CategoryList()
-  categories.set(res.data.data)
-})
+if (ref(navigator.onLine) && ref(navigator.onLine).value) {
+  Posservice.trademark().then((res) => {
+    const trademarks = TrademarkList()
+    trademarks.set(res.data.data)
+    localStorage.setItem('trademarks', JSON.stringify(res.data.data))
+  })
+  Posservice.category().then((res) => {
+    const categories = CategoryList()
+    categories.set(res.data.data)
+    localStorage.setItem('categories', JSON.stringify(res.data.data))
+  })
+}
+
 // Reactive dữ liệu của component
 const showProduct = ref(false)
 const tab = ref(0)

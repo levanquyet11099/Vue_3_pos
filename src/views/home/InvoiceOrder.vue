@@ -243,6 +243,7 @@ import Posservice from '@/service/Posservice.js'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
 import AddCustomer from '@/components/customer/AddCustomer.vue'
 import { useToast } from 'vue-toastification'
+import Cookies from 'js-cookie'
 const toast = useToast()
 // const keywords = ref('')
 const emit = defineEmits(['createOrderSusccess'])
@@ -283,7 +284,7 @@ interface typePrice {
 }
 interface Order {
   id: string
-  customer: string
+  customer: number
   value: string
   time: string
   status: number
@@ -296,6 +297,7 @@ interface Order {
   products: Array<any>
   ref_sub: string
   sale_id: number
+  sale_name: string
   store_id: number
   user_id: number
   utm_source: string
@@ -407,26 +409,55 @@ const searchCustomer = (input: { data: string }) => {
     return
   }
   loading.value = true
+  User_data.value = storeUser.get as User
+  User_data.value = localStorage.getItem('UserInfo')
+    ? JSON.parse(localStorage.getItem('UserInfo'))
+    : User_data.value
   // Gọi API tìm kiếm khách hàng
-  Posservice.customer(input.data).then((res) => {
-    // Cập nhật danh sách khách hàng
-    // localItemSelect.value = res.data.data
-    searchResults.value = res.data.data.map((customer: Customer) => ({
-      ...customer,
-      title: `${customer.fullname} - ${customer.mobile}`,
-      value: customer,
-    }))
-    // searchResults.value = res.data.data
-    // console.log('searchCustomer', searchResults.value)
+  if (isOnline.value) {
+    Posservice.customer(input.data).then((res) => {
+      // Cập nhật danh sách khách hàng
+      // localItemSelect.value = res.data.data
+      localStorage.setItem('customerList_' + User_data.value.shop_id, JSON.stringify(res.data.data))
+      searchResults.value = res.data.data.map((customer: Customer) => ({
+        ...customer,
+        title: `${customer.fullname} - ${customer.mobile}`,
+        value: customer,
+      }))
+      // searchResults.value = res.data.data
+      // console.log('searchCustomer', searchResults.value)
+      loading.value = false
+    })
+  } else {
+    let customerList = localStorage.getItem('customerList_' + User_data.value.shop_id)
+    if (customerList) {
+      searchResults.value = JSON.parse(customerList).map((customer: Customer) => ({
+        ...customer,
+        title: `${customer.fullname} - ${customer.mobile}`,
+        value: customer,
+      }))
+    }
     loading.value = false
-  })
+  }
 }
 const create_Order = () => {
+  const saleName = Cookies.get('full_name') || ''
   User_data.value = storeUser.get as User
+  User_data.value = localStorage.getItem('UserInfo')
+    ? JSON.parse(localStorage.getItem('UserInfo'))
+    : User_data.value
   BrandSelected.value = BrandSelect().get as Brand
   if (!selectedCustomer.value) {
-    toast.error('Vui lòng chọn khách hàng', { timeout: 2000 })
-    return
+    const dataCustomer = localStorage.getItem('customerList_' + User_data.value.shop_id)
+      ? JSON.parse(localStorage.getItem('customerList_' + User_data.value.shop_id))
+      : null
+    if (dataCustomer && dataCustomer.length > 0) {
+      selectedCustomer.value = dataCustomer.filter(
+        (customer: Customer) => customer.fullname === 'Khách lẻ',
+      )[0]
+    }
+    // toast.error('Vui lòng chọn khách hàng', { timeout: 2000 })
+    // return
   }
   if (!localItemSelect.value?.products?.length) {
     toast.error('Vui lòng chọn sản phẩm', { timeout: 2000 })
@@ -471,6 +502,7 @@ const create_Order = () => {
   let data = {
     id: Helper.getMaxId(User_data.value.shop_id),
     time: time,
+    customer: selectedCustomer.value.id,
     store_id: BrandSelected.value.store_id,
     full_name: selectedCustomer.value.fullname,
     phone: selectedCustomer.value.mobile,
@@ -490,6 +522,7 @@ const create_Order = () => {
     pay_status: 1,
     pay_money: totalPayNumber.value,
     sale_id: User_data.value.user_id,
+    sale_name: saleName,
     user_id: User_data.value.user_id,
   }
   if (usePoint.value) {
@@ -501,6 +534,7 @@ const create_Order = () => {
     console.log('online')
     delete data.id
     delete data.time
+    delete data.customer
     // delete data.status
     // Helper.pushOrderLocal(data, shop_id)
     Posservice.createOrder(data, selectedCustomer.value.id).then(async (res) => {

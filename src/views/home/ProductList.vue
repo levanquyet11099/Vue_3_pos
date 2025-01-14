@@ -23,8 +23,19 @@ interface Category {
 const components = {
   IconDown,
 }
-const Trademark = TrademarkList().get
-const Category = CategoryList().get
+let Trademark = []
+let Category = []
+if (ref(navigator.onLine) && ref(navigator.onLine).value) {
+  Trademark = TrademarkList().get
+  Category = CategoryList().get
+} else {
+  Trademark = localStorage.getItem('trademarks')
+    ? JSON.parse(localStorage.getItem('trademarks'))
+    : []
+  Category = localStorage.getItem('categories')
+    ? JSON.parse(localStorage.getItem('categories'))
+    : []
+}
 const selectedSupplier = ref<Trademark>({
   id: 0,
   code: '',
@@ -88,12 +99,15 @@ if (localStorage.getItem('products') && localStorage.getItem('products') !== 'un
   console.log('get products from local storage')
   products.value = JSON.parse(localStorage.getItem('products') || '')
 }
-// Lấy danh sách sản phẩm từ API
-Posservice.getProducts().then((res) => {
+if (ref(navigator.onLine) && ref(navigator.onLine).value) {
+  // Lấy danh sách sản phẩm từ API
   console.log('get products from api')
-  products.value = res.data.data
-  localStorage.setItem('products', JSON.stringify(res.data.data))
-})
+  Posservice.getProducts().then((res) => {
+    products.value = res.data.data
+    localStorage.setItem('products', JSON.stringify(res.data.data))
+  })
+}
+
 const addproduct = (product: any) => {
   emit('addproduct', product)
 }

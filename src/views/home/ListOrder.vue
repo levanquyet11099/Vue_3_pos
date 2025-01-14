@@ -8,12 +8,13 @@ import IconDeleteTab from '@/components/icons/IconDeleteTab.vue'
 import IconSearch from '@/components/icons/IconSearch.vue'
 import OrderDetail from './OrderDetail.vue'
 import IconDocument from '@/components/icons/IconDocument.vue'
+import Posservice from '@/service/Posservice'
 // import { Order } from '@/types/order'
 // import { OrderStatus } from '@/types/orderStatus'
 // import { OrderType } from '@/types/orderType'
 interface Order {
   id: string
-  customer: string
+  customer: number
   value: string
   time: string
   status: number
@@ -26,6 +27,7 @@ interface Order {
   products: Array<any>
   ref_sub: string
   sale_id: number
+  sale_name: string
   store_id: number
   user_id: number
   utm_source: string
@@ -59,6 +61,9 @@ let dataOrderDetail = ref<Order>(null)
 let orders = ref<Order[]>([])
 onMounted(() => {
   user.value = UserInfo().get as User
+  user.value = localStorage.getItem('UserInfo')
+    ? JSON.parse(localStorage.getItem('UserInfo'))
+    : user.value
   const list_order = localStorage.getItem('orderListOffline_' + user.value.shop_id)
   if (list_order) {
     orders.value = JSON.parse(list_order) as Order[]
@@ -100,6 +105,37 @@ const orderListFilter = computed(() => {
     return orders.value
   }
 })
+const syncOrder = () => {
+  console.log('syncOrder')
+  if (orderListFilter.value.length > 0) {
+    orderListFilter.value.forEach((order: Order) => {
+      // if (order.status == 0) {
+      //   console.log('order thanh cong')
+      // }
+      let customer_id = 0
+      if (order.id) {
+        // console.log('order.id')
+        delete order.id
+      }
+      if (order.time) {
+        // console.log('order.time')
+        delete order.time
+      }
+      if (order.customer) {
+        // console.log('order.customer')
+        customer_id = order.customer
+        delete order.customer
+      }
+      if (order.value) {
+        // console.log('order.value')
+        delete order.value
+      }
+      Posservice.createOrder(order, customer_id)
+    })
+    // localStorage.setItem('orderListOffline_' + user.value.shop_id, JSON.stringify(orderListFilter.value))
+    // emit('userChange')
+  }
+}
 // if (user.value) {
 //   console.log('listorder', user.value)
 //   const list_order = localStorage.getItem('listorderOffline_' + user.value.shop_id)
@@ -132,7 +168,10 @@ const orderListFilter = computed(() => {
           />
         </div>
 
-        <button class="bg-blue-500 text-white px-4 rounded w-auto h-[42px] text-nowrap">
+        <button
+          class="bg-blue-500 text-white px-4 rounded w-auto h-[42px] text-nowrap"
+          @click="syncOrder"
+        >
           Đồng bộ đơn hàng
         </button>
       </div>
@@ -150,11 +189,11 @@ const orderListFilter = computed(() => {
               <th class="px-4 py-2 rounded-r-[8px]">Hành động</th>
             </tr>
           </thead>
-          <tbody class="w-full max-h-[400px]" style="height: 300px; overflow-y: auto">
+          <tbody class="w-full">
             <tr
               v-for="(order, index) in orderListFilter"
               :key="index"
-              class="border-b items-center justify-center"
+              class="border-b items-center justify-center max-h-[50px]"
             >
               <td class="px-4 py-4 text-primary">{{ order.id }}</td>
               <td class="px-4 py-4 text-center">{{ order.full_name }}</td>
@@ -198,7 +237,7 @@ const orderListFilter = computed(() => {
           />
         </div>
 
-        <button class="bg-blue-500 text-white px-4 rounded w-auto h-[42px] text-nowrap">
+        <button class="bg-blue-300 text-white px-4 rounded w-auto h-[42px] text-nowrap">
           Đồng bộ đơn hàng
         </button>
       </div>
@@ -232,26 +271,3 @@ const orderListFilter = computed(() => {
   >
   </OrderDetail>
 </template>
-<style scoped>
-.scroll-edit {
-  -ms-overflow-style: inherit; /* IE and Edge */
-  scrollbar-width: 2px; /* Firefox */
-  overflow-y: auto;
-  scrollbar-color: #c1c1c1 #f5f5f5; /* Firefox */
-}
-
-.scroll-edit::-webkit-scrollbar {
-  width: 2px; /* Width of the scrollbar */
-}
-
-.scroll-edit::-webkit-scrollbar-track {
-  background: #f5f5f5; /* Background of the scrollbar track */
-  border-radius: 10px; /* Rounded corners for the track */
-}
-
-.scroll-edit::-webkit-scrollbar-thumb {
-  background-color: #c1c1c1; /* Color of the scrollbar thumb */
-  border-radius: 10px; /* Rounded corners for the thumb */
-  border: 2px solid #f5f5f5; /* Padding around the thumb */
-}
-</style>

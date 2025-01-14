@@ -17,7 +17,7 @@
           <div class="flex justify-between w-full space-x-4">
             <div class="max-w-[456px] w-full bg-gray-100 max-h-[62px] h-[62px] p-2 rounded-[8px]">
               <div class="font-200 text-gray-500">Người tạo</div>
-              <div class="text-[#333333]">Nguyễn Văn A</div>
+              <div class="text-[#333333]">{{ OrderDetail.sale_name || 'Nguyễn Văn A' }}</div>
             </div>
             <div class="max-w-[456px] w-full bg-gray-100 max-h-[62px] h-[62px] p-2 rounded-[8px]">
               <div class="font-200 text-gray-500">Ngày tạo</div>
@@ -174,7 +174,7 @@ import IconDeleteTab from '@/components/icons/IconDeleteTab.vue'
 import { Helper } from '@/helper'
 interface Order {
   id: string
-  customer: string
+  customer: number
   value: string
   time: string
   status: number
@@ -187,6 +187,7 @@ interface Order {
   products: Array<any>
   ref_sub: string
   sale_id: number
+  sale_name: string
   store_id: number
   user_id: number
   utm_source: string

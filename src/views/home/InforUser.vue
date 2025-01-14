@@ -19,6 +19,7 @@ interface User_data {
 }
 
 let Brand = BrandList().get
+Brand = localStorage.getItem('BrandList') ? JSON.parse(localStorage.getItem('BrandList')) : Brand
 let User = ref<User_data>({
   status: 0,
   shop_id: '',
@@ -32,6 +33,9 @@ let User = ref<User_data>({
   data: '',
 })
 User.value = UserInfo().get as User_data
+User.value = localStorage.getItem('UserInfo')
+  ? JSON.parse(localStorage.getItem('UserInfo'))
+  : User.value
 let selectedBrand = ref({
   id: 0,
   shop_id: 0,
@@ -45,7 +49,13 @@ watch(
   (val) => {
     if (val) {
       User.value = UserInfo().get as User_data
+      User.value = localStorage.getItem('UserInfo')
+        ? JSON.parse(localStorage.getItem('UserInfo'))
+        : User.value
       Brand = BrandList().get
+      Brand = localStorage.getItem('BrandList')
+        ? JSON.parse(localStorage.getItem('BrandList'))
+        : Brand
       selectedBrand.value = Brand[0]
     }
   },
@@ -78,6 +88,9 @@ watch(
 
 onMounted(() => {
   User.value = UserInfo().get as User_data
+  User.value = localStorage.getItem('UserInfo')
+    ? JSON.parse(localStorage.getItem('UserInfo'))
+    : User.value
   Brand = BrandList().get
   if (Brand.length > 0) {
     selectedBrand.value = Brand[0]

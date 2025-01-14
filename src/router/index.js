@@ -18,7 +18,7 @@ const router = createRouter({
         {
           path: '/pos/subindex/shift',
           name: 'shift',
-          component: () => import('../views/home/AboutView.vue'),
+          component: () => import('../views/home/ShiftView.vue'),
         },
       ],
     },

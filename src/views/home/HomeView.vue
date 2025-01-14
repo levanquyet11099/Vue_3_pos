@@ -12,18 +12,27 @@ import { BrandList, UserInfo } from '@/stores/store.js'
 // }
 let user = ref(false)
 const token = localStorage.getItem('token')
-Posservice.userInfo(token).then((res) => {
-  if (res.data.status === 200) {
-    UserInfo().set(res.data)
-    if (res.data.user_id)
-      Posservice.brand(res.data.user_id).then((res) => {
-        if (res.data.status === 1) {
-          BrandList().set(res.data.data)
-          user.value = true
-        }
-      })
-  }
-})
+if (ref(navigator.onLine) && ref(navigator.onLine).value) {
+  Posservice.userInfo(token).then((res) => {
+    if (res.data.status === 200) {
+      UserInfo().set(res.data)
+      localStorage.setItem('UserInfo', JSON.stringify(res.data))
+      if (res.data.user_id)
+        Posservice.brand(res.data.user_id).then((res) => {
+          if (res.data.status === 1) {
+            BrandList().set(res.data.data)
+            localStorage.setItem('BrandList', JSON.stringify(res.data.data))
+            user.value = true
+          }
+        })
+    }
+  })
+} else {
+  setTimeout(() => {
+    user.value = true
+  }, 200)
+}
+
 const userChange = () => {
   user.value = !user.value
 }

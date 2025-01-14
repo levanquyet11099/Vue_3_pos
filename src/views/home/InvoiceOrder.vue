@@ -576,6 +576,7 @@ const create_Order = () => {
     })
     PaymentCustomer.value = 0
     selectedCustomer.value = null
+    discount.value = 0
     pointOrder.value = 0
     emit('createOrderSusccess', true)
     toast.success('Đơn hàng đã được tạo thành công!', { timeout: 2000 })
@@ -584,6 +585,7 @@ const create_Order = () => {
     Helper.pushOrderLocal(data, shop_id)
     selectedCustomer.value = null
     PaymentCustomer.value = 0
+    discount.value = 0
     emit('createOrderSusccess', true)
     toast.success('Đơn hàng đã được tạo thành công!', { timeout: 2000 })
   }

@@ -2,16 +2,41 @@
 import { ref } from 'vue'
 // import { Helper } from '../helper.js'
 import Posservice from '@/service/Posservice.js'
+import { useToast } from 'vue-toastification'
+const toast = useToast()
 const emit = defineEmits(['save', 'close'])
 const formData = ref({
   name: '',
   email: '',
   phone: '',
   address: '',
-  gender: '',
+  gender: 1,
 })
 const submitForm = () => {
-  console.log('submitForm', formData.value)
+  Posservice.createCustomer(formData.value).then((res) => {
+    if (res.data.status === 1) {
+      toast.success('Thêm khách hàng thành công', { timeout: 2000 })
+      const datauser = localStorage.getItem('UserInfo')
+        ? JSON.parse(localStorage.getItem('UserInfo'))
+        : {}
+      const customerList = localStorage.getItem('customerList_' + datauser.shop_id)
+        ? JSON.parse(localStorage.getItem('customerList_' + datauser.shop_id))
+        : []
+      customerList.push({
+        id: res.data.data.customer_id,
+        fullname: formData.value.name,
+        mobile: formData.value.phone,
+        email: formData.value.email,
+        address: formData.value.address,
+        point: 0,
+      })
+      localStorage.setItem('customerList_' + datauser.shop_id, JSON.stringify(customerList))
+      emit('save', res)
+      emit('close', true)
+    } else {
+      toast.error('Không thêm được khách hàng', { timeout: 2000 })
+    }
+  })
   // Gọi API thêm khách hàng
 
   //   emit('close', true)
@@ -77,7 +102,7 @@ const close = () => {
               <input
                 type="radio"
                 v-model="formData.gender"
-                value="male"
+                value="1"
                 required
                 class="form-radio text-blue-500"
               />
@@ -87,7 +112,7 @@ const close = () => {
               <input
                 type="radio"
                 v-model="formData.gender"
-                value="female"
+                value="2"
                 required
                 class="form-radio text-blue-500"
               />
@@ -115,7 +140,7 @@ const close = () => {
     </div>
   </div>
 </template>
-<script   lang="ts">
+<script lang="ts">
 export default {
   name: 'InvoiceOrder',
 }

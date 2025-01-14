@@ -76,6 +76,14 @@ class PosService {
       },
     })
   }
+  createCustomer(data) {
+    return axios.post(config.API_SALEKIT + 'customer/addinfo', data, {
+      headers: {
+        'Content-type': 'application/json',
+        token: token,
+      },
+    })
+  }
   printOrder(data) {
     return axios.post(config.API_SALEKIT + 'order/print', data, {
       headers: {

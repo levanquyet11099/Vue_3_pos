@@ -10,6 +10,7 @@ const config = {
     import.meta.env.NODE_ENV === 'production'
       ? 'https://api.salekit.com:3039/api/v1/'
       : 'https://api.salekit.com:3039/api/v1/',
+  BASE_ROUTER: '/pos/subindex',
   // API_URL_CLIENT: process.env.NODE_ENV === 'production' ? 'https://fchat.vn/api_v1/' : 'http://fchat.vn.test/api_v2/',
 
   // DOMAIN_URL: process.env.NODE_ENV === 'production' ? 'https://fchat-app.salekit.com:4039/' : 'https://fchat-app.salekit.com:4039/',

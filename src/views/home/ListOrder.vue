@@ -136,52 +136,56 @@ const orderListFilter = computed(() => {
           Đồng bộ đơn hàng
         </button>
       </div>
-      <table class="min-w-full bg-white p-4 rounded-[16px] w-full">
-        <thead>
-          <tr class="bg-gray-200 rounded-[16px]">
-            <th class="px-4 py-2 text-left rounded-l-[8px]">ID</th>
-            <th class="px-4 py-2">Khách hàng</th>
-            <th class="px-4 py-2">Giá trị</th>
-            <th class="px-4 py-2">Thời gian</th>
-            <th class="px-4 py-2">Trạng thái</th>
-            <th class="px-4 py-2 rounded-r-[8px]">Hành động</th>
-          </tr>
-        </thead>
-        <tbody class="overflow-y-auto w-full">
-          <tr
-            v-for="(order, index) in orderListFilter"
-            :key="index"
-            class="border-b items-center justify-center"
-          >
-            <td class="px-4 py-4 text-primary">{{ order.id }}</td>
-            <td class="px-4 py-4 text-center">{{ order.full_name }}</td>
-            <td class="px-4 py-4 text-center">
-              {{
-                Helper.calculateTotalPay(
-                  order.products,
-                  order.discount,
-                  Helper.calculatePoint(order.point, order.rate_point),
-                )
-              }}
-            </td>
-            <td class="px-4 py-4 text-center">{{ order.time }}</td>
-            <td class="px-4 py-4 text-center">
-              {{ order.status == 0 ? 'Chưa đồng bộ' : 'Chưa đồng bộ' }}
-            </td>
-            <td class="flex px-4 py-4 items-center justify-center">
-              <button class="text-blue-500 hover:underline" @click="detailOrder(order)">
-                <IconSee></IconSee>
-              </button>
-              <button
-                class="text-red-500 rounded-[8px] ml-2 hover:bg-blue-200"
-                @click="deleteOrder(index)"
-              >
-                <IconDelete1></IconDelete1>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div
+        class="min-w-full bg-white rounded-[16px] w-full h-full max-h-[73vh] no-scrollbar overflow-y-auto"
+      >
+        <table class="min-w-full bg-white p-4 rounded-[16px] w-full">
+          <thead class="sticky top-0 bg-white z-10">
+            <tr class="bg-gray-200 rounded-[16px]">
+              <th class="px-4 py-2 text-left rounded-l-[8px]">ID</th>
+              <th class="px-4 py-2">Khách hàng</th>
+              <th class="px-4 py-2">Giá trị</th>
+              <th class="px-4 py-2">Thời gian</th>
+              <th class="px-4 py-2">Trạng thái</th>
+              <th class="px-4 py-2 rounded-r-[8px]">Hành động</th>
+            </tr>
+          </thead>
+          <tbody class="w-full max-h-[400px]" style="height: 300px; overflow-y: auto">
+            <tr
+              v-for="(order, index) in orderListFilter"
+              :key="index"
+              class="border-b items-center justify-center"
+            >
+              <td class="px-4 py-4 text-primary">{{ order.id }}</td>
+              <td class="px-4 py-4 text-center">{{ order.full_name }}</td>
+              <td class="px-4 py-4 text-center">
+                {{
+                  Helper.calculateTotalPay(
+                    order.products,
+                    order.discount,
+                    Helper.calculatePoint(order.point, order.rate_point),
+                  )
+                }}
+              </td>
+              <td class="px-4 py-4 text-center">{{ order.time }}</td>
+              <td class="px-4 py-4 text-center">
+                {{ order.status == 0 ? 'Chưa đồng bộ' : 'Chưa đồng bộ' }}
+              </td>
+              <td class="flex px-4 py-4 items-center justify-center">
+                <button class="text-blue-500 hover:underline" @click="detailOrder(order)">
+                  <IconSee></IconSee>
+                </button>
+                <button
+                  class="text-red-500 rounded-[8px] ml-2 hover:bg-blue-200"
+                  @click="deleteOrder(index)"
+                >
+                  <IconDelete1></IconDelete1>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <div v-else class="p-4 w-full">
       <div class="flex items-center justify-between mb-4">
@@ -228,3 +232,26 @@ const orderListFilter = computed(() => {
   >
   </OrderDetail>
 </template>
+<style scoped>
+.scroll-edit {
+  -ms-overflow-style: inherit; /* IE and Edge */
+  scrollbar-width: 2px; /* Firefox */
+  overflow-y: auto;
+  scrollbar-color: #c1c1c1 #f5f5f5; /* Firefox */
+}
+
+.scroll-edit::-webkit-scrollbar {
+  width: 2px; /* Width of the scrollbar */
+}
+
+.scroll-edit::-webkit-scrollbar-track {
+  background: #f5f5f5; /* Background of the scrollbar track */
+  border-radius: 10px; /* Rounded corners for the track */
+}
+
+.scroll-edit::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the thumb */
+  border: 2px solid #f5f5f5; /* Padding around the thumb */
+}
+</style>

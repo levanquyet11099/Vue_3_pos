@@ -103,7 +103,7 @@
       class="hover:bg-white"
       style="padding: 12px; border-radius: 8px"
       title="Quản lý ca"
-      to="pos/shift"
+      to="/pos/subindex/shift"
     >
       <svg
         width="24"

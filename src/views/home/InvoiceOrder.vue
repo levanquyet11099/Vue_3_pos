@@ -242,8 +242,8 @@ import { Helper } from '../../helper.js'
 import Posservice from '@/service/Posservice.js'
 import 'vue-multiselect/dist/vue-multiselect.min.css'
 import AddCustomer from '@/components/customer/AddCustomer.vue'
-import { notify } from '@kyvg/vue3-notification'
-
+import { useToast } from 'vue-toastification'
+const toast = useToast()
 // const keywords = ref('')
 const emit = defineEmits(['createOrderSusccess'])
 let searchResults = ref([])
@@ -382,32 +382,21 @@ let User_data = ref<User>({
   },
   data: '',
 })
+
 // let User = UserInfo().get
 const isOnline = ref(navigator.onLine)
 const checkCoupon = () => {
   if (coupon_id.value.trim() === '') {
-    notify({
-      title: 'Lỗi',
-      text: 'Vui lòng nhập mã coupon',
-      group: 'error',
-    })
+    toast.error('Vui lòng nhập mã coupon', { timeout: 2000 })
     return
   }
   // Gọi API kiểm tra mã coupon
   Posservice.checkCoupon(coupon_id.value).then((res) => {
     if (res.data.data) {
+      toast.success('Áp dụng mã coupon thành công', { timeout: 2000 })
       discount.value = res.data.data.discount
-      notify({
-        title: 'Thành công',
-        text: 'Áp dụng mã coupon thành công',
-        type: 'success',
-      })
     } else {
-      notify({
-        title: 'Lỗi',
-        text: 'Mã coupon không hợp lệ',
-        group: 'error',
-      })
+      toast.error('Mã coupon không hợp lệ', { timeout: 2000 })
     }
   })
   toggleCouponBox()
@@ -436,19 +425,11 @@ const create_Order = () => {
   User_data.value = storeUser.get as User
   BrandSelected.value = BrandSelect().get as Brand
   if (!selectedCustomer.value) {
-    notify({
-      title: 'Lỗi',
-      text: 'Vui lòng chọn khách hàng',
-      group: 'error',
-    })
+    toast.error('Vui lòng chọn khách hàng', { timeout: 2000 })
     return
   }
   if (!localItemSelect.value?.products?.length) {
-    notify({
-      title: 'Lỗi',
-      text: 'Vui lòng chọn sản phẩm',
-      type: 'error',
-    })
+    toast.error('Vui lòng chọn sản phẩm', { timeout: 2000 })
     return
   }
   let products: {
@@ -533,24 +514,16 @@ const create_Order = () => {
     })
     PaymentCustomer.value = 0
     selectedCustomer.value = null
-
+    pointOrder.value = 0
     emit('createOrderSusccess', true)
-    notify({
-      title: 'Thành công',
-      text: 'Đơn hàng đã được tạo thành công!',
-      type: 'success',
-    })
+    toast.success('Đơn hàng đã được tạo thành công!', { timeout: 2000 })
   } else {
     console.log('offline')
     Helper.pushOrderLocal(data, shop_id)
     selectedCustomer.value = null
     PaymentCustomer.value = 0
     emit('createOrderSusccess', true)
-    notify({
-      title: 'Thành công',
-      text: 'Đơn hàng đã được lưu offline!',
-      type: 'success',
-    })
+    toast.success('Đơn hàng đã được tạo thành công!', { timeout: 2000 })
   }
 }
 const updateStatus = () => {

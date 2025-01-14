@@ -16,8 +16,10 @@ import { ref, reactive, onMounted, watch, watchEffect, nextTick } from 'vue'
 import { TrademarkList, CategoryList, UserInfo } from '../../stores/store.js'
 import Posservice from '../../service/Posservice'
 import Select2 from '@/components/select2/Select2.vue'
+import config from '@/config'
 // import SelectMunti from '@/components/select2/SelectMunti.vue'
 
+const BASE_ROUTER = config.BASE_ROUTER
 interface User {
   status: number
   shop_id: string
@@ -260,7 +262,7 @@ const deleteProduct = (index: number) => {
         />
       </RouterLink>
     </div>
-    <div v-if="$route.path === '/pos/subindex' || '/pos' || '/'" class="flex max-w-[25vw] w-full">
+    <div v-if="$route.path === BASE_ROUTER" class="flex max-w-[25vw] w-full">
       <div
         class="autocomplete-container bg-white min-w-[22vw] ml-4 mt-2 flex items-center border px-2 py-1 mb-4 pt-0 rounded-full h-[40px] space-x-2"
       >
@@ -304,7 +306,7 @@ const deleteProduct = (index: number) => {
       </div>
     </div>
     <div
-      v-if="$route.path === '/pos/subindex' || '/pos' || '/'"
+      v-if="$route.path === BASE_ROUTER"
       class="flex gap-4 ml-[100px] pt-[15px] max-w-[30vw] flex-no-wrap overflow-x-auto overflow-y-hidden"
     >
       <div
@@ -329,7 +331,7 @@ const deleteProduct = (index: number) => {
       </div>
     </div>
     <IconAddTab
-      v-if="$route.path === '/pos/subindex' || '/pos' || '/'"
+      v-if="$route.path === BASE_ROUTER"
       @click="addTab()"
       class="hover:cursor-pointer mt-5 ml-4"
     />
@@ -339,7 +341,7 @@ const deleteProduct = (index: number) => {
   <div class="flex bg-gray-200">
     <TheWelcome></TheWelcome>
     <div
-      v-if="$route.path === '/pos/subindex' || '/pos' || '/'"
+      v-if="$route.path === BASE_ROUTER"
       class="pl-[20px] mr-[16px] ml-[75px] max-w-[70vw] mt-[16px] rounded-[8px] bg-white min-w-[70vw] h-[calc(100vh - 84px)]"
       style="height: calc(100vh - 84px); max-height: calc(100vh - 84px)"
     >
@@ -454,7 +456,7 @@ const deleteProduct = (index: number) => {
       </div>
     </div>
     <InvoiceOrder
-      v-if="$route.path === '/' || '/pos/subindex' || '/pos'"
+      v-if="$route.path === BASE_ROUTER"
       :itemSelect="itemSelect"
       @createOrderSusccess="createOrderSusccess"
     ></InvoiceOrder>

@@ -115,7 +115,7 @@ export default {
         </button>
 
         <div class="flex items-center pr-0">
-          <router-link to="/pos/listorder">
+          <router-link to="/pos/subindex/listorder">
             <div
               class="bg-[#733D96] rounded-full h-[39px] w-[39px] flex items-center justify-center"
             >

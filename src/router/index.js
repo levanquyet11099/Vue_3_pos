@@ -10,13 +10,13 @@ const router = createRouter({
       component: HomeView,
       children: [
         {
-          path: 'pos/listorder',
+          path: '/pos/subindex/listorder',
           name: 'pos/listorder',
           component: () => import('../views/home/ListOrder.vue'),
           props: true,
         },
         {
-          path: 'pos/shift',
+          path: '/pos/subindex/shift',
           name: 'shift',
           component: () => import('../views/home/AboutView.vue'),
         },

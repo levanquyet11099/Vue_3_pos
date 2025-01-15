@@ -5,18 +5,24 @@ import IconZoomOut from '@/components/icons/IconZoomOut.vue'
 import IconForsquater from '@/components/icons/IconForSquater.vue'
 import IconDelete1 from '@/components/icons/IconDelete1.vue'
 import IconAdd from '@/components/icons/IconAdd.vue'
+import IconIncrease from '@/components/icons/IconIncrease.vue'
+import IconDecrease from '@/components/icons/IconDecrease.vue'
 import IconSearch from '@/components/icons/IconSearch.vue'
 import IconDeleteTab from '@/components/icons/IconDeleteTab.vue'
+import IconPullLeft from '@/components/icons/IconPullLeft.vue'
+import IconPullRight from '@/components/icons/IconPullRight.vue'
 import More from '@/components/icons/More.vue'
 import ProductList from './ProductList.vue'
 import TheWelcome from '@/components/TheWelcome.vue'
 import InvoiceOrder from './InvoiceOrder.vue'
 import { Helper } from '../../helper.js'
-import { ref, reactive, onMounted, watch, watchEffect, nextTick } from 'vue'
+import { ref, reactive, onMounted, watch, watchEffect, nextTick, computed } from 'vue'
 import { TrademarkList, CategoryList, UserInfo } from '../../stores/store.js'
 import Posservice from '../../service/Posservice'
 import Select2 from '@/components/select2/Select2.vue'
 import config from '@/config'
+import { useToast } from 'vue-toastification'
+const toast = useToast()
 // import SelectMunti from '@/components/select2/SelectMunti.vue'
 
 const BASE_ROUTER = config.BASE_ROUTER
@@ -147,6 +153,7 @@ if (ref(navigator.onLine) && ref(navigator.onLine).value) {
 
 // Reactive dữ liệu của component
 const showProduct = ref(false)
+const showinputQuantity = ref(false)
 const tab = ref(0)
 const items = reactive<Item[]>([
   {
@@ -178,24 +185,38 @@ const changeTab = (newTab: number) => {
   itemSelect.value = items[newTab] || null
 }
 function updateQuantity(product: Product, change: number) {
-  const selectedProduct = itemSelect.value?.products.find((p) => p.id === product.id)
-  const index_ = itemSelect.value?.products.findIndex((p) => p.id === product.id)
-  if (selectedProduct) {
-    selectedProduct.quantity += change // Cộng/trừ số lượng
-    if (selectedProduct.quantity < 1) selectedProduct.quantity = 1 // Không cho phép số lượng nhỏ hơn 1
-    selectedProduct.total = selectedProduct.quantity * selectedProduct.price
-    // if (itemSelect.value) {
-    //   itemSelect.value.products[index_] = selectedProduct
-    // }
+  if (product.enable_order == 1) {
+    const selectedProduct = itemSelect.value?.products.find((p) => p.id === product.id)
+    if (selectedProduct) {
+      selectedProduct.quantity += change // Cộng/trừ số lượng
+      if (selectedProduct.quantity < 1) selectedProduct.quantity = 1 // Không cho phép số lượng nhỏ hơn 1
+      selectedProduct.total = selectedProduct.quantity * selectedProduct.price_sale
+    }
+  } else {
+    if (product.inventory) {
+      const selectedProduct = itemSelect.value?.products.find((p) => p.id === product.id)
+      if (selectedProduct) {
+        selectedProduct.quantity += change // Cộng/trừ số lượng
+        if (product.inventory < selectedProduct.quantity) {
+          selectedProduct.quantity = product.inventory
+        }
+        if (selectedProduct.quantity < 1) selectedProduct.quantity = 1 // Không cho phép số lượng nhỏ hơn 1
+        selectedProduct.total = selectedProduct.quantity * selectedProduct.price_sale
+      }
+    }
   }
 }
 const addproduct = (product: Product) => {
   const selectedProduct = itemSelect.value?.products.find((p) => p.id === product.id)
-  if (selectedProduct) {
-    selectedProduct.quantity += 1
-    selectedProduct.total = selectedProduct.quantity * selectedProduct.price
+  if (product.inventory > 0 || product.enable_order == 1) {
+    if (selectedProduct) {
+      selectedProduct.quantity += 1
+      selectedProduct.total = selectedProduct.quantity * selectedProduct.price_sale
+    } else {
+      itemSelect.value?.products.push({ ...product, quantity: 1, total: product.price_sale })
+    }
   } else {
-    itemSelect.value?.products.push({ ...product, quantity: 1, total: product.price })
+    toast.error('Sản phẩm đã hết hàng', { timeout: 2000 })
   }
 }
 
@@ -258,6 +279,50 @@ const deleteTab = (index: number) => {
 const deleteProduct = (index: number) => {
   itemSelect.value?.products.splice(index, 1)
 }
+const scrollRight = () => {
+  const crolltab = document.getElementById('crolltab')
+  if (crolltab) {
+    isScrollLeftVisible.value = crolltab.scrollLeft
+    isScrollwidth.value = crolltab.scrollWidth
+    crolltab.scrollLeft += 300
+    crolltab.style.scrollBehavior = 'smooth'
+    setTimeout(() => {
+      if (crolltab.scrollLeft >= crolltab.scrollWidth) {
+        isScrollwidth.value = crolltab.scrollWidth
+      }
+    }, 200)
+  }
+}
+const scrollLeft = () => {
+  const crolltab = document.getElementById('crolltab')
+  if (crolltab) {
+    isScrollLeftVisible.value = crolltab.scrollLeft
+    isScrollwidth.value = crolltab.scrollWidth
+    crolltab.scrollLeft -= 300
+    crolltab.style.scrollBehavior = 'smooth'
+    if (crolltab.scrollLeft <= 0) {
+      isScrollLeftVisible.value = 0
+    }
+  }
+}
+const isScrollLeftVisible = ref(0)
+const isScrollwidth = ref(0)
+window.addEventListener('scroll', () => {
+  const crolltab = document.getElementById('crolltab')
+  if (crolltab) {
+    isScrollLeftVisible.value = crolltab.scrollLeft
+    isScrollwidth.value = crolltab.scrollWidth
+  }
+})
+
+watch(tab, () => {
+  const crolltab = document.getElementById('crolltab')
+  if (crolltab) {
+    isScrollLeftVisible.value = crolltab.scrollLeft
+    isScrollwidth.value = crolltab.scrollWidth
+    crolltab.style.scrollBehavior = 'smooth'
+  }
+})
 </script>
 <template>
   <div
@@ -285,7 +350,7 @@ const deleteProduct = (index: number) => {
           hide-no-data
           item-color="#428BCA"
           variant="solo"
-          class="h-[40px] w-full max-w-[18vw] mt-2 ml-0"
+          class="h-[40px] w-full max-w-[18vw] mt-2 ml-0 no-scrollbar"
           flat
           transition="v-menu__content:translateY(12px) !important"
           min-width="15vw"
@@ -295,7 +360,7 @@ const deleteProduct = (index: number) => {
         >
           <template #item="{ item }">
             <div
-              class="flex items-center mb-3 mt-3 max-w-[21vw] overflow-x-hidden cursor-pointer hover:bg-gray-200"
+              class="flex items-center max-w-[21vw] overflow-x-hidden cursor-pointer hover:bg-gray-200 border-b py-1 pt-1 min-w-[21vw] no-scrollbar"
               @click="addproduct(item.value)"
             >
               <img
@@ -304,9 +369,31 @@ const deleteProduct = (index: number) => {
                 "
                 class="w-[45px] h-[45px] mr-2 ml-2"
               />
-              <span class="text-nowrap truncate text-[14px]"
-                >{{ item.value.product_name }} - {{ item.value.sku }}</span
-              >
+              <div>
+                <div class="text-nowrap truncate text-[14px] max-w-[13vw]">
+                  {{ item.value.product_name }}
+                </div>
+                <div class="text-blue-400 text-[14px]">{{ item.value.attribute }}</div>
+                <div class="text-[#7a7a7a] text-[14px]">{{ item.value.sku }}</div>
+              </div>
+              <div class="ml-auto text-center h-full w-[110px]">
+                <div class="font-[600] pt-0">
+                  {{ Helper.formatCurrency(item.value.price_sale) }}
+                </div>
+                <div v-if="item.value.inventory" class="text-nowrap">
+                  có thể bán: {{ item.value.inventory }}
+                </div>
+                <div
+                  v-else-if="item.value.enable_order == 1"
+                  title="Không giới hạn"
+                  class="text-nowrap"
+                >
+                  có thể bán: ---
+                </div>
+                <div v-else title="Hết hàng" class="text-nowrap">
+                  có thể bán: <span class="text-red">0</span>
+                </div>
+              </div>
             </div>
           </template>
         </v-autocomplete>
@@ -316,8 +403,16 @@ const deleteProduct = (index: number) => {
       </div>
     </div>
     <div
+      v-if="$route.path === BASE_ROUTER && isScrollLeftVisible > 0"
+      class="ml-[20px] hover:bg-gray-300 mt-[13px] rounded-t-[10px] w-[20px] cursor-pointer items-center justify-center h-[39px] text-center flex"
+      @click="scrollLeft"
+    >
+      <IconPullLeft></IconPullLeft>
+    </div>
+    <div
       v-if="$route.path === BASE_ROUTER"
-      class="flex gap-4 ml-[100px] pt-[15px] max-w-[30vw] flex-no-wrap overflow-x-auto overflow-y-hidden"
+      id="crolltab"
+      class="flex gap-4 ml-[10px] pt-[13px] max-w-[30vw] flex-no-wrap overflow-x-auto overflow-y-hidden no-scrollbar"
     >
       <div
         v-for="(n, index) in items"
@@ -340,6 +435,14 @@ const deleteProduct = (index: number) => {
         </div>
       </div>
     </div>
+    <div
+      v-if="$route.path === BASE_ROUTER && isScrollwidth - isScrollLeftVisible > 1"
+      class="ml-[10px] hover:bg-gray-300 mt-[13px] rounded-t-[10px] w-[20px] cursor-pointer items-center justify-center h-[39px] text-center flex"
+      @click="scrollRight"
+    >
+      <IconPullRight></IconPullRight>
+    </div>
+
     <IconAddTab
       v-if="$route.path === BASE_ROUTER"
       @click="addTab()"
@@ -401,30 +504,39 @@ const deleteProduct = (index: number) => {
                 </p>
               </div>
               <div
-                class="flex items-center w-1/5 border-[1px] border-[#7a7a7a] rounded-[4px] h-[40px] py-3"
+                class="flex items-center w-1/5 border-[1px] border-[#CED4DA] rounded-[4px] h-[40px] py-3"
               >
                 <!-- Nút trừ -->
                 <button
-                  class="px-2 py-1 hover:bg-gray-300 text-[14px] font-bold w-1/3 h-[38px] rounded-l-[4px]"
+                  class="px-2 py-1 hover:bg-gray-300 text-[14px] font-bold w-1/3 h-[38px] rounded-l-[4px] border-[#CED4DA] flex items-center justify-center"
                   @click="updateQuantity(p, -1)"
                 >
-                  -
+                  <IconDecrease></IconDecrease>
                 </button>
 
                 <!-- Hiển thị số lượng -->
                 <p
+                  v-if="showinputQuantity == false"
+                  @click="showinputQuantity = true"
                   id="quantityDisplay"
-                  class="py-2 text-[14px] text-center font-bold text-[#7a7a7a] w-1/3 border-[1px] border-[#7a7a7a] h-[40px]"
+                  class="py-2 text-[14px] text-center font-bold text-[#7a7a7a] w-1/3 border-[1px] border-[#CED4DA] h-[40px] focus:outline-none border"
                 >
                   {{ p.quantity }}
                 </p>
+                <input
+                  v-else="showinputQuantity"
+                  @blur="showinputQuantity = false"
+                  type="number"
+                  v-model="p.quantity"
+                  class="py-2 z-10 text-[14px] text-center font-bold text-[#7a7a7a] w-1/3 border h-[40px] focus:outline-none"
+                />
 
                 <!-- Nút cộng -->
                 <button
-                  class="px-2 py-1 hover:bg-gray-300 text-[14px] font-bold w-1/3 h-[38px] rounded-r-[4px]"
+                  class="px-2 py-1 hover:bg-gray-300 text-[14px] font-bold w-1/3 h-[38px] rounded-r-[4px] flex items-center justify-center"
                   @click="updateQuantity(p, 1)"
                 >
-                  +
+                  <IconIncrease></IconIncrease>
                 </button>
               </div>
 
@@ -472,4 +584,13 @@ const deleteProduct = (index: number) => {
     ></InvoiceOrder>
   </div>
 </template>
-<style scoped></style>
+<style scoped>
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+</style>

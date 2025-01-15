@@ -449,7 +449,7 @@ const searchCustomer = (input: { data: string }) => {
       localStorage.setItem('customerList_' + User_data.value.shop_id, JSON.stringify(res.data.data))
       searchResults.value = res.data.data.map((customer: Customer) => ({
         ...customer,
-        title: `${customer.fullname} - ${customer.mobile}`,
+        title: `${customer.fullname} - ${customer.email}-  ${customer.mobile}`,
         value: customer,
       }))
       // searchResults.value = res.data.data
@@ -461,7 +461,7 @@ const searchCustomer = (input: { data: string }) => {
     if (customerList) {
       searchResults.value = JSON.parse(customerList).map((customer: Customer) => ({
         ...customer,
-        title: `${customer.fullname} - ${customer.mobile}`,
+        title: `${customer.fullname} - ${customer.email}- ${customer.mobile}`,
         value: customer,
       }))
     }

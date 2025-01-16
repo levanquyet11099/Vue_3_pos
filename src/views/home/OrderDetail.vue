@@ -50,28 +50,30 @@
                   <div class="font-[400] text-[#333333]">Vietcombank</div>
                   <div class="text-blue-500 font-[400] text-[14px] bg-[#E8F4FF]">Đã thanh toán</div>
                 </div>
-
                 <div class="text-font-100 text-gray-600">049117317544</div>
               </div>
             </div>
           </div>
           <div class="justify-between max-w-[456px] w-full space-y-3 p-3">
             <div class="flex justify-between">
-              <span class="font-[400] text-left text-[#333333]">Tổng tiền hàng</span> 390.000 VNĐ
+              <span class="font-[400] text-left text-[#333333]">Tổng tiền hàng</span>
+              {{ Helper.calculateTotalAmount(OrderDetail.products) }}
             </div>
             <div class="flex justify-between">
-              <span class="font-[400] text-left text-[#333333]">Coupon</span> KM50
+              <span class="font-[400] text-left text-[#333333]">Coupon</span>
+              {{ OrderDetail.coupon_id }}
             </div>
             <div class="flex justify-between">
-              <span class="font-[400] text-left text-[#333333]">Chiết khấu</span> 5.000 VNĐ
+              <span class="font-[400] text-left text-[#333333]">Chiết khấu</span
+              >{{ Helper.formatCurrency(OrderDetail.discount) }}
             </div>
-            <div class="flex justify-between">
-              <span class="font-[400] text-left text-[#333333]">Đã dùng điểm thưởng</span> 100.000
-              VNĐ
+            <div v-if="OrderDetail.point" class="flex justify-between">
+              <span class="font-[400] text-left text-[#333333]">Đã dùng điểm thưởng</span
+              >{{ OrderDetail.point * OrderDetail.rate_point }}
             </div>
             <div class="flex justify-between">
               <div class="font-[600] text-left">Thu khách hàng</div>
-              395.000 VNĐ
+              {{ Helper.calculateTotalPay(OrderDetail.products, OrderDetail.discount) }}
             </div>
           </div>
         </div>
@@ -99,6 +101,10 @@
             <div class="flex justify-between">
               <span class="font-[400] text-left text-[#333333]">Chiết khấu</span
               >{{ Helper.formatCurrency(OrderDetail.discount) }}
+            </div>
+            <div v-if="OrderDetail.point" class="flex justify-between">
+              <span class="font-[400] text-left text-[#333333]">Đã dùng điểm thưởng</span
+              >{{ OrderDetail.point * OrderDetail.rate_point }}
             </div>
             <div class="flex justify-between">
               <div class="font-[600] text-left">Thu khách hàng</div>
@@ -192,6 +198,8 @@ interface Order {
   user_id: number
   utm_source: string
   payment_method: number
+  point: number
+  rate_point: number
   coupon_id: string
 }
 const props = defineProps(['dataOrderDetail'])
